@@ -711,10 +711,10 @@ var MenuTab = /** @class */ (function () {
         var _this = this;
         var convertTemplate = _a.convertTemplate;
         this.handleMenuTab = function (e) {
-            var navList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".nav__button");
             if (!e.target.classList.contains("nav__button")) {
                 return;
             }
+            var navList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".nav__button");
             navList.forEach(function (button) {
                 return button.dataset.menu === e.target.dataset.menu
                     ? button.classList.add("button-click")
@@ -771,6 +771,7 @@ var Product = /** @class */ (function () {
         var _this = this;
         this.handleAddProduct = function (e) {
             e.preventDefault();
+            _this.productNameTdList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-name", _this.productTable);
             var _a = _this.productInfoInputs.map(function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
             var productNameList = _this.productNameTdList.map(function (productNameTd) { return productNameTd.textContent; });
             try {
@@ -787,30 +788,38 @@ var Product = /** @class */ (function () {
             _this.productTable.insertAdjacentHTML("beforeend", (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.addProductTemplate)(productName, +productPrice, +productQuantity));
         };
         this.handleRemoveProduct = function (e) {
-            if (e.target.classList.contains("product-remove-button")) {
-                e.target.closest("tr").remove();
+            if (!e.target.classList.contains("product-remove-button")) {
+                return;
             }
+            ;
+            if (!confirm("정말 삭제하시겠습니까?")) {
+                return;
+            }
+            ;
+            e.target.closest("tr").remove();
         };
         this.handleEditProduct = function (e) {
-            if (e.target.classList.contains("product-edit-button")) {
-                var _a = Array.from(e.target.closest("tr").children), productNameTd = _a[0], productPriceTd = _a[1], productQuantityTd = _a[2];
-                e.target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.editProductTemplate)(productNameTd.textContent, +productPriceTd.textContent, +productQuantityTd.textContent);
-                var productEditInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input")[0];
-                productEditInput.focus();
+            if (!e.target.classList.contains("product-edit-button")) {
+                return;
             }
+            var _a = Array.from(e.target.closest("tr").children), productNameTd = _a[0], productPriceTd = _a[1], productQuantityTd = _a[2];
+            e.target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.editProductTemplate)(productNameTd.textContent, +productPriceTd.textContent, +productQuantityTd.textContent);
+            var productEditInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input")[0];
+            productEditInput.focus();
         };
         this.handleConfirmProduct = function (e) {
-            if (e.target.classList.contains("product-confirm-button")) {
-                var _a = Array.from((0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input"), function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
-                var productNameList = _this.productNameTdList.map(function (productNameTd) { return productNameTd.textContent; });
-                try {
-                    (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.verifyProductInfo)(productName, +productPrice, +productQuantity, productNameList);
-                    _this.changeEditProductInfo(productName, +productPrice, +productQuantity, e.target);
-                }
-                catch (_b) {
-                    var message = _b.message;
-                    alert(message);
-                }
+            if (!e.target.classList.contains("product-confirm-button")) {
+                return;
+            }
+            var _a = Array.from((0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input"), function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
+            var productNameList = _this.productNameTdList.map(function (productNameTd) { return productNameTd.textContent; });
+            try {
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.verifyProductInfo)(productName, +productPrice, +productQuantity, productNameList);
+                _this.changeEditProductInfo(productName, +productPrice, +productQuantity, e.target);
+            }
+            catch (_b) {
+                var message = _b.message;
+                alert(message);
             }
         };
         this.changeEditProductInfo = function (productName, productPrice, productQuantity, target) {
@@ -822,7 +831,6 @@ var Product = /** @class */ (function () {
         this.productInfoInputs = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-control-input");
         this.productAddButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-add-button");
         this.productTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-control-table");
-        this.productNameTdList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-name", this.productTable);
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productAddButton, "click", this.handleAddProduct);
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleRemoveProduct);
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleEditProduct);
