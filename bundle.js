@@ -2,6 +2,47 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/ts/utils/dom.js":
+/*!*****************************!*\
+  !*** ./src/ts/utils/dom.js ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+
+exports.__esModule = true;
+exports.addEvent = exports.selectDomAll = exports.selectDom = void 0;
+
+var selectDom = function selectDom(selector, element) {
+  if (element === void 0) {
+    element = document;
+  }
+
+  return element.querySelector(selector);
+};
+
+exports.selectDom = selectDom;
+
+var selectDomAll = function selectDomAll(selector, element) {
+  if (element === void 0) {
+    element = document;
+  }
+
+  return Array.from(element.querySelectorAll(selector));
+};
+
+exports.selectDomAll = selectDomAll;
+
+var addEvent = function addEvent(target, eventName, handler) {
+  Array.isArray(target) ? target.map(function (v) {
+    return v.addEventListener(eventName, handler);
+  }) : target.addEventListener(eventName, handler);
+};
+
+exports.addEvent = addEvent;
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js!./src/css/index.css":
 /*!*****************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!./src/css/index.css ***!
@@ -540,7 +581,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/dom */ "./src/ts/utils/dom.js");
 /* harmony import */ var _charge_Charge__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./charge/Charge */ "./src/ts/components/charge/Charge.ts");
 /* harmony import */ var _menuTab_MenuTab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menuTab/MenuTab */ "./src/ts/components/menuTab/MenuTab.ts");
 /* harmony import */ var _menuTab_menuTabTemplate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menuTab/menuTabTemplate */ "./src/ts/components/menuTab/menuTabTemplate.ts");
@@ -555,13 +596,14 @@ var Vendingmachine = /** @class */ (function () {
         var _this = this;
         this.convertTemplate = function (path) {
             var routes = {
-                "#charge": function () { return _this.charge.render(); },
                 "#product": function () { return _this.product.render(); },
+                "#charge": function () { return _this.charge.render(); },
                 "#purchase": function () { return ""; }
             };
             routes[path]();
         };
         this.vendingmachineWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#app");
+        console.log(this.vendingmachineWrap);
         this.vendingmachineWrap.insertAdjacentHTML("beforeend", "<h1>\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> ".concat(_menuTab_menuTabTemplate__WEBPACK_IMPORTED_MODULE_3__.menuTabTemplate, " <main class=\"main\"></main>"));
         this.mountComponent();
         this.convertTemplate(location.hash || "#product");
@@ -569,9 +611,9 @@ var Vendingmachine = /** @class */ (function () {
     }
     Vendingmachine.prototype.mountComponent = function () {
         var _this = this;
-        this.menuTab = new _menuTab_MenuTab__WEBPACK_IMPORTED_MODULE_2__["default"]({ convertTemplate: this.convertTemplate });
-        this.charge = new _charge_Charge__WEBPACK_IMPORTED_MODULE_1__["default"]();
+        this.menuTab = new _menuTab_MenuTab__WEBPACK_IMPORTED_MODULE_2__["default"](this.convertTemplate);
         this.product = new _product_Product__WEBPACK_IMPORTED_MODULE_4__["default"]();
+        this.charge = new _charge_Charge__WEBPACK_IMPORTED_MODULE_1__["default"]();
         if (!location.hash) {
             history.pushState({ path: "#product" }, null, "#product");
         }
@@ -605,16 +647,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.js");
 /* harmony import */ var _utils_validation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/validation */ "./src/ts/utils/validation.ts");
-/* harmony import */ var _chargeTemplate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./chargeTemplate */ "./src/ts/components/charge/chargeTemplate.ts");
+/* harmony import */ var _ChargeView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChargeView */ "./src/ts/components/charge/ChargeView.ts");
 
 
 
 var Charge = /** @class */ (function () {
     function Charge() {
         var _this = this;
-        this.handleAddCharge = function (e) {
+        this.handleInputAmount = function (e) {
             e.preventDefault();
             var charge = _this.chargeInput.valueAsNumber;
             try {
@@ -627,15 +669,16 @@ var Charge = /** @class */ (function () {
                 return;
             }
         };
+        this.chargeView = new _ChargeView__WEBPACK_IMPORTED_MODULE_2__["default"]();
         this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
-        this.coinKindCount = { 10: 0, 50: 0, 100: 0, 500: 0 };
-        this.totalCharge = 0;
+        this.coinsKindCount = this.getCoinList();
+        this.totalCharge = this.getTotalCharge();
     }
     Charge.prototype.bindChargeDom = function () {
         this.chargeForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#charge-control-form");
         this.chargeInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".charge-control-input");
         this.currentContainCharge = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#current-contain-charge");
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.chargeForm, "submit", this.handleAddCharge);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.chargeForm, "submit", this.handleInputAmount);
     };
     Charge.prototype.convertRandomCharge = function (charge) {
         var totalAmount = 0;
@@ -647,31 +690,76 @@ var Charge = /** @class */ (function () {
                 totalAmount -= randomCoin;
             }
             else if (totalAmount <= charge) {
-                this.coinKindCount[randomCoin]++;
+                this.coinsKindCount[randomCoin]++;
             }
         }
-        this.showRandomChargeResult(Object.values(this.coinKindCount).reverse());
+        this.chargeView.showRandomChargeResult(this.coinsKindCount, this.totalCharge);
+        this.setCoinList();
+        this.setTotalCharge();
     };
     Charge.prototype.pickNumberInList = function () {
         var coinList = [10, 50, 100, 500];
         var randomNumber = Math.floor(Math.random() * coinList.length);
         return coinList[randomNumber];
     };
-    Charge.prototype.showRandomChargeResult = function (chargeResult) {
-        var chargeCoinCount = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".charge-coin-count");
-        this.currentContainCharge.textContent = "".concat(this.totalCharge);
-        Array.from(chargeCoinCount, function (coinCount, index) {
-            return (coinCount.innerText = "".concat(chargeResult[index], "\uAC1C"));
-        });
+    Charge.prototype.setCoinList = function () {
+        localStorage.setItem("COIN_LIST", JSON.stringify(this.coinsKindCount));
+    };
+    Charge.prototype.getCoinList = function () {
+        return JSON.parse(localStorage.getItem("COIN_LIST")) || { 10: 0, 50: 0, 100: 0, 500: 0 };
+    };
+    Charge.prototype.setTotalCharge = function () {
+        localStorage.setItem("TOTAL_CHARGE", JSON.stringify(this.totalCharge));
+    };
+    Charge.prototype.getTotalCharge = function () {
+        return JSON.parse(localStorage.getItem("TOTAL_CHARGE")) || 0;
     };
     Charge.prototype.render = function () {
-        this.vendingmachineFunctionWrap.replaceChildren();
-        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_chargeTemplate__WEBPACK_IMPORTED_MODULE_2__.chargeTemplate)());
+        this.chargeView.renderChargeView();
+        this.chargeView.showRandomChargeResult(this.coinsKindCount, this.totalCharge);
         this.bindChargeDom();
     };
     return Charge;
 }());
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Charge);
+
+
+/***/ }),
+
+/***/ "./src/ts/components/charge/ChargeView.ts":
+/*!************************************************!*\
+  !*** ./src/ts/components/charge/ChargeView.ts ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.js");
+/* harmony import */ var _chargeTemplate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./chargeTemplate */ "./src/ts/components/charge/chargeTemplate.ts");
+
+
+var ChargeView = /** @class */ (function () {
+    function ChargeView() {
+        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
+    }
+    ChargeView.prototype.showRandomChargeResult = function (coinsKindCount, totalCharge) {
+        this.currentContainCharge = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#current-contain-charge");
+        var chargeResult = Object.values(coinsKindCount).reverse();
+        var chargeCoinCount = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".charge-coin-count");
+        this.currentContainCharge.textContent = "".concat(totalCharge);
+        chargeCoinCount.forEach(function (coinCount, index) {
+            return (coinCount.innerText = "".concat(chargeResult[index], "\uAC1C"));
+        });
+    };
+    ChargeView.prototype.renderChargeView = function () {
+        this.vendingmachineFunctionWrap.replaceChildren();
+        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_chargeTemplate__WEBPACK_IMPORTED_MODULE_1__.chargeTemplate)());
+    };
+    return ChargeView;
+}());
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ChargeView);
 
 
 /***/ }),
@@ -704,21 +792,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.js");
 
 var MenuTab = /** @class */ (function () {
-    function MenuTab(_a) {
+    function MenuTab(convertTemplate) {
         var _this = this;
-        var convertTemplate = _a.convertTemplate;
+        this.convertTemplate = convertTemplate;
         this.handleMenuTab = function (e) {
             if (!e.target.classList.contains("nav__button")) {
                 return;
             }
             var navList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".nav__button");
-            navList.forEach(function (button) {
-                return button.dataset.menu === e.target.dataset.menu
-                    ? button.classList.add("button-click")
-                    : button.classList.remove("button-click");
+            if (e.target.dataset.menu ===
+                navList.find(function (navButton) { return navButton.classList.contains("button-click"); }).dataset.menu) {
+                return;
+            }
+            navList.forEach(function (navButton) {
+                return navButton.dataset.menu === e.target.dataset.menu
+                    ? navButton.classList.add("button-click")
+                    : navButton.classList.remove("button-click");
             });
             history.pushState({ path: e.target.dataset.menu }, null, e.target.dataset.menu);
             _this.convertTemplate(location.hash);
@@ -760,92 +852,208 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.js");
 /* harmony import */ var _utils_validation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/validation */ "./src/ts/utils/validation.ts");
-/* harmony import */ var _productTemplate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./productTemplate */ "./src/ts/components/product/productTemplate.ts");
+/* harmony import */ var _ProductView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ProductView */ "./src/ts/components/product/ProductView.ts");
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 
 
 
 var Product = /** @class */ (function () {
     function Product() {
         var _this = this;
-        this.handleAddProduct = function (e) {
-            e.preventDefault();
-            _this.productNameTdList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-name", _this.productTable);
+        this.handleAddProduct = function (event) {
+            event.preventDefault();
             var _a = _this.productInfoInputs.map(function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
-            var productNameList = _this.productNameTdList.map(function (productNameTd) { return productNameTd.textContent; });
+            var productNameList = _this.productList.map(function (product) { return product.productName; });
             try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.verifyProductInfo)(productName, +productPrice, +productQuantity, productNameList);
-                _this.productInfoInputs.forEach(function (input) { return (input.value = ""); });
-                var productNameInput = _this.productInfoInputs[0];
-                productNameInput.focus();
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateProductName)(productName);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateProductPrice)(+productPrice);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.valudateProductQuantity)(+productQuantity);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateSameProductName)(productName, productNameList);
+                _this.productList = __spreadArray(__spreadArray([], _this.productList, true), [{ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity }], false);
+                _this.setProductList();
+                _this.productView.changeProductInfoInputEmpty();
+                _this.productView.focusProductNameInput();
+                _this.productView.addProduct({
+                    productName: productName,
+                    productPrice: +productPrice,
+                    productQuantity: +productQuantity
+                });
             }
             catch (_b) {
                 var message = _b.message;
                 alert(message);
                 return;
             }
-            _this.productTable.insertAdjacentHTML("beforeend", (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.addProductTemplate)(productName, +productPrice, +productQuantity));
         };
-        this.handleRemoveProduct = function (e) {
-            if (!e.target.classList.contains("product-remove-button")) {
-                return;
+        this.handleControlProduct = function (event) {
+            if (event.target.classList.contains("product-remove-button")) {
+                _this.handleRemoveProduct(event);
             }
-            ;
+            else if (event.target.classList.contains("product-edit-button")) {
+                _this.handleEditProduct(event);
+            }
+            else if (event.target.classList.contains("product-confirm-button")) {
+                _this.handleConfirmProduct(event);
+            }
+        };
+        this.handleRemoveProduct = function (event) {
             if (!confirm("정말 삭제하시겠습니까?")) {
                 return;
             }
             ;
-            e.target.closest("tr").remove();
+            var productNameTd = Array.from(event.target.closest("tr").children)[0];
+            _this.productList = _this.productList.filter(function (product) { return product.productName !== productNameTd.textContent; });
+            _this.setProductList();
+            _this.productView.removeProduct(event.target);
         };
-        this.handleEditProduct = function (e) {
-            if (!e.target.classList.contains("product-edit-button")) {
-                return;
-            }
-            var _a = Array.from(e.target.closest("tr").children), productNameTd = _a[0], productPriceTd = _a[1], productQuantityTd = _a[2];
-            e.target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.editProductTemplate)(productNameTd.textContent, +productPriceTd.textContent, +productQuantityTd.textContent);
-            var productEditInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input")[0];
-            productEditInput.focus();
+        this.handleEditProduct = function (event) {
+            _this.productView.prepareEditProduct(event.target);
+            _this.productView.focusProductEditInput();
         };
-        this.handleConfirmProduct = function (e) {
-            if (!e.target.classList.contains("product-confirm-button")) {
-                return;
-            }
-            var _a = Array.from((0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input"), function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
-            var productNameList = _this.productNameTdList.map(function (productNameTd) { return productNameTd.textContent; });
+        this.handleConfirmProduct = function (event) {
+            var _a = Array.from((0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input", event.target.closest("tr")), function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
+            var beforeProductName = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".product-name", event.target.closest("tr")).dataset.name;
+            var productNameList = _this.productList
+                .map(function (product) { return product.productName; })
+                .filter(function (productName) { return productName !== beforeProductName; });
             try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.verifyProductInfo)(productName, +productPrice, +productQuantity, productNameList);
-                _this.changeEditProductInfo(productName, +productPrice, +productQuantity, e.target);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateProductName)(productName);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateProductPrice)(+productPrice);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.valudateProductQuantity)(+productQuantity);
+                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateSameProductName)(productName, productNameList);
+                _this.changeEditProductInfo({
+                    target: event.target,
+                    productName: productName,
+                    productPrice: +productPrice,
+                    productQuantity: +productQuantity
+                });
             }
             catch (_b) {
                 var message = _b.message;
                 alert(message);
+                return;
             }
         };
-        this.changeEditProductInfo = function (productName, productPrice, productQuantity, target) {
-            target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.addProductTemplate)(productName, productPrice, productQuantity);
+        this.changeEditProductInfo = function (_a) {
+            var target = _a.target, productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
+            _this.productView.editProduct({ target: target, productName: productName, productPrice: productPrice, productQuantity: productQuantity });
+            var changeProductIndex = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-name", _this.productTable)
+                .map(function (productTd) { return productTd.textContent; })
+                .indexOf(productName);
+            _this.productList[changeProductIndex].productName = productName;
+            _this.productList[changeProductIndex].productPrice = productPrice;
+            _this.productList[changeProductIndex].productQuantity = productQuantity;
+            _this.setProductList();
         };
-        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
+        this.productView = new _ProductView__WEBPACK_IMPORTED_MODULE_2__["default"]();
+        this.productView.renderProductView();
+        this.productList = this.getProductList();
     }
     Product.prototype.bindProductDom = function () {
         this.productInfoInputs = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-control-input");
         this.productAddButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-add-button");
         this.productTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-control-table");
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productAddButton, "click", this.handleAddProduct);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleRemoveProduct);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleEditProduct);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleConfirmProduct);
-        var productNameInput = this.productInfoInputs[0];
-        productNameInput.focus();
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleControlProduct);
+        this.productView.focusProductNameInput();
+    };
+    Product.prototype.setProductList = function () {
+        localStorage.setItem("PRODUCTS", JSON.stringify(this.productList));
+    };
+    Product.prototype.getProductList = function () {
+        return JSON.parse(localStorage.getItem("PRODUCTS")) || [];
     };
     Product.prototype.render = function () {
-        this.vendingmachineFunctionWrap.replaceChildren();
-        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_productTemplate__WEBPACK_IMPORTED_MODULE_2__.productTemplate)());
+        this.productView.renderProductView();
+        this.productView.showProductList(this.productList);
         this.bindProductDom();
     };
     return Product;
 }());
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Product);
+
+
+/***/ }),
+
+/***/ "./src/ts/components/product/ProductView.ts":
+/*!**************************************************!*\
+  !*** ./src/ts/components/product/ProductView.ts ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.js");
+/* harmony import */ var _productTemplate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./productTemplate */ "./src/ts/components/product/productTemplate.ts");
+
+
+var ProductView = /** @class */ (function () {
+    function ProductView() {
+        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
+    }
+    ProductView.prototype.addProduct = function (_a) {
+        var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
+        this.productTable.insertAdjacentHTML("beforeend", (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.addProductTemplate)({
+            productName: productName,
+            productPrice: +productPrice,
+            productQuantity: +productQuantity
+        }));
+    };
+    ProductView.prototype.removeProduct = function (target) {
+        target.closest("tr").remove();
+    };
+    ProductView.prototype.prepareEditProduct = function (target) {
+        var _a = Array.from(target.closest("tr").children), productNameTd = _a[0], productPriceTd = _a[1], productQuantityTd = _a[2];
+        target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.editProductTemplate)({
+            productName: productNameTd.textContent,
+            productPrice: +productPriceTd.textContent,
+            productQuantity: +productQuantityTd.textContent
+        });
+    };
+    ProductView.prototype.editProduct = function (_a) {
+        var target = _a.target, productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
+        target.closest("tr").innerHTML = (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.addProductTemplate)({
+            productName: productName,
+            productPrice: productPrice,
+            productQuantity: productQuantity
+        });
+    };
+    ProductView.prototype.focusProductNameInput = function () {
+        this.productInfoInputs = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-control-input");
+        var productNameInput = this.productInfoInputs[0];
+        productNameInput.focus();
+    };
+    ProductView.prototype.focusProductEditInput = function () {
+        var productEditInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input")[0];
+        productEditInput.focus();
+    };
+    ProductView.prototype.changeProductInfoInputEmpty = function () {
+        this.productInfoInputs.forEach(function (input) { return (input.value = ""); });
+    };
+    ProductView.prototype.showProductList = function (productList) {
+        this.productTable.insertAdjacentHTML("beforeend", productList.map(function (product) { return (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.addProductTemplate)(product); }).join(' '));
+    };
+    ;
+    ProductView.prototype.renderProductView = function () {
+        this.vendingmachineFunctionWrap.replaceChildren();
+        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.productTemplate)());
+        this.productTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-control-table");
+    };
+    return ProductView;
+}());
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ProductView);
 
 
 /***/ }),
@@ -865,11 +1073,13 @@ __webpack_require__.r(__webpack_exports__);
 var productTemplate = function () {
     return "\n    <section id=\"product-control-section\">\n      <div>\n        <form id=\"product-control-form\">\n          <label>\uCD94\uAC00\uD560 \uC0C1\uD488 \uC815\uBCF4\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.</label>\n            <div>\n              <input placeholder=\"\uC0C1\uD488\uBA85\" class=\"product-control-input\" />\n              <input type=\"number\" placeholder=\"\uAC00\uACA9\" class=\"product-control-input\" />\n              <input type=\"number\" placeholder=\"\uC218\uB7C9\" class=\"product-control-input\" />\n              <button type=\"submit\" id=\"product-add-button\">\uCD94\uAC00</button>\n            </div>\n        </form>  \n      </div>\n      <div>\n        <h1 id=\"product-table-title\">\uC0C1\uD488 \uD604\uD669</h1>\n        <table id=\"product-control-table\">\n          <tr>\n            <th>\uC0C1\uD488\uBA85</th>\n            <th>\uAC00\uACA9</th>\n            <th>\uC218\uB7C9</th>\n            <th></th>\n          </tr>\n        </table>\n      </div>\n    </section>";
 };
-var addProductTemplate = function (productName, productPrice, productQuantity) {
+var addProductTemplate = function (_a) {
+    var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
     return "\n    <tr>\n      <td class=\"product-name\">".concat(productName, "</td>\n      <td>").concat(productPrice, "</td>\n      <td>").concat(productQuantity, "</td>\n      <td>\n        <button type=\"button\" class=\"product-edit-button\">\uC218\uC815</button>\n        <button type=\"button\" class=\"product-remove-button\">\uC81C\uAC70</button>\n      </td>\n    </tr>");
 };
-var editProductTemplate = function (productName, productPrice, productQuantity) {
-    return "\n    <td class=\"product-name\"><input class=\"product-edit-input\" value='".concat(productName, "' /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productPrice, "' /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productQuantity, "' /></td>\n    <td><button type=\"button\" class=\"product-confirm-button\">\uD655\uC778</button></td>\n  ");
+var editProductTemplate = function (_a) {
+    var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
+    return "\n    <td class=\"product-name\" data-name=\"".concat(productName, "\" ><input class=\"product-edit-input\" value=\"").concat(productName, "\" /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productPrice, "' /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productQuantity, "' /></td>\n    <td><button type=\"button\" class=\"product-confirm-button\">\uD655\uC778</button></td>\n  ");
 };
 
 
@@ -905,36 +1115,6 @@ var CHARGE = {
 
 /***/ }),
 
-/***/ "./src/ts/utils/dom.ts":
-/*!*****************************!*\
-  !*** ./src/ts/utils/dom.ts ***!
-  \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "selectDom": () => (/* binding */ selectDom),
-/* harmony export */   "selectDomAll": () => (/* binding */ selectDomAll),
-/* harmony export */   "addEvent": () => (/* binding */ addEvent)
-/* harmony export */ });
-var selectDom = function (selector, element) {
-    if (element === void 0) { element = document; }
-    return element.querySelector(selector);
-};
-var selectDomAll = function (selector, element) {
-    if (element === void 0) { element = document; }
-    return Array.from(element.querySelectorAll(selector));
-};
-var addEvent = function (target, eventName, handler) {
-    Array.isArray(target)
-        ? target.map(function (v) { return v.addEventListener(eventName, handler); })
-        : target.addEventListener(eventName, handler);
-};
-
-
-
-/***/ }),
-
 /***/ "./src/ts/utils/validation.ts":
 /*!************************************!*\
   !*** ./src/ts/utils/validation.ts ***!
@@ -943,20 +1123,25 @@ var addEvent = function (target, eventName, handler) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "verifyProductInfo": () => (/* binding */ verifyProductInfo),
+/* harmony export */   "validateProductName": () => (/* binding */ validateProductName),
+/* harmony export */   "validateProductPrice": () => (/* binding */ validateProductPrice),
+/* harmony export */   "valudateProductQuantity": () => (/* binding */ valudateProductQuantity),
+/* harmony export */   "validateSameProductName": () => (/* binding */ validateSameProductName),
 /* harmony export */   "verifyCharge": () => (/* binding */ verifyCharge)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/ts/utils/constants.ts");
 
-var verifyProductInfo = function (productName, productPrice, productQuantity, productNameList) {
-    if (productNameList.includes(productName)) {
-        throw new Error("중복된 상품명은 등록할 수 없습니다.");
-    }
-    if (productName.trim() === "" || typeof productPrice !== "number") {
-        throw new Error("값을 모두 입력해주세요.");
+var validateProductName = function (productName) {
+    if (productName.trim() === "") {
+        throw new Error("상품명을 입력해주세요.");
     }
     if (productName.length > _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_LENGTH) {
         throw new Error("\uC0C1\uD488\uBA85\uC740 \uCD5C\uB300 ".concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_LENGTH, "\uAE00\uC790\uAE4C\uC9C0 \uC785\uB825 \uAC00\uB2A5\uD569\uB2C8\uB2E4."));
+    }
+};
+var validateProductPrice = function (productPrice) {
+    if (typeof productPrice !== "number") {
+        throw new Error("값을 모두 입력해주세요.");
     }
     if (productPrice < _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MIN_PRICE || productPrice > _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_PRICE) {
         throw new Error("\uC0C1\uD488 \uAC00\uACA9\uC740 ".concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MIN_PRICE, "\uC6D0\uBD80\uD130, \uCD5C\uB300 ").concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_PRICE, "\uC6D0\uAE4C\uC9C0 \uAC00\uB2A5\uD569\uB2C8\uB2E4."));
@@ -964,12 +1149,19 @@ var verifyProductInfo = function (productName, productPrice, productQuantity, pr
     if (productPrice % _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.UNIT !== 0) {
         throw new Error("\uC0C1\uD488 \uAC00\uACA9\uC740 ".concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.UNIT, "\uC6D0\uC73C\uB85C \uB098\uB204\uC5B4 \uB5A8\uC5B4\uC838\uC57C\uD569\uB2C8\uB2E4."));
     }
+};
+var valudateProductQuantity = function (productQuantity) {
     if (productQuantity > _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_QUANTITY ||
         productQuantity < _constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MIN_QUANTITY) {
         throw new Error("\uC81C\uD488\uB2F9 \uC218\uB7C9\uC740 \uCD5C\uC18C ".concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MAX_QUANTITY, "\uAC1C\uBD80\uD130 \uCD5C\uB300 ").concat(_constants__WEBPACK_IMPORTED_MODULE_0__.PRODUCT.MIN_QUANTITY, "\uAC1C\uAE4C\uC9C0 \uAC00\uB2A5\uD569\uB2C8\uB2E4."));
     }
     if (productQuantity - Math.floor(productQuantity)) {
         throw new Error("제품의 수량은 소수점으로 입력할 수 없습니다.");
+    }
+};
+var validateSameProductName = function (productName, productNameList) {
+    if (productNameList.includes(productName)) {
+        throw new Error("같은 이름의 제품은 등록할 수 없습니다.");
     }
 };
 var verifyCharge = function (charge) {
@@ -1067,10 +1259,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ts_components_Vendingmachine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ts/components/Vendingmachine */ "./src/ts/components/Vendingmachine.ts");
 
 
-function startVendingmachine() {
-    new _ts_components_Vendingmachine__WEBPACK_IMPORTED_MODULE_1__["default"]();
-}
-document.addEventListener("DOMContentLoaded", startVendingmachine);
+document.addEventListener("DOMContentLoaded", function () { return new _ts_components_Vendingmachine__WEBPACK_IMPORTED_MODULE_1__["default"](); });
 
 })();
 
