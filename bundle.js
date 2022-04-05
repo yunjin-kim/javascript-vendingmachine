@@ -3133,7 +3133,7 @@ var Login = /** @class */ (function () {
                         _a = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.selectDomAll)(".member-info-input"), emailInput = _a[0], passwordInput = _a[1];
                         emailInputValue = emailInput.value;
                         passwordValue = passwordInput.value;
-                        return [4 /*yield*/, axios__WEBPACK_IMPORTED_MODULE_0___default().post("http://localhost:3000/login", {
+                        return [4 /*yield*/, axios__WEBPACK_IMPORTED_MODULE_0___default().post("https://vendingdb.herokuapp.com/login", {
                                 body: JSON.stringify({
                                     email: emailInputValue,
                                     password: passwordValue
@@ -3988,7 +3988,7 @@ var Signup = /** @class */ (function () {
                         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue);
                         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue);
                         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue);
-                        return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/users", {
+                        return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/register", {
                                 method: "POST",
                                 body: JSON.stringify({
                                     email: emailInputValueResult,
@@ -4003,7 +4003,8 @@ var Signup = /** @class */ (function () {
                         response = _a.sent();
                         console.log(response);
                         if (response.status === 404) {
-                            throw new Error();
+                            throw Error();
+                            return [2 /*return*/];
                         }
                         history.pushState({ path: "#login" }, null, "#login");
                         this.convertTemplate("#login");
