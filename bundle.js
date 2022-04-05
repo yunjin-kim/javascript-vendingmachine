@@ -1,2167 +1,6 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
-
-/***/ "./node_modules/axios/index.js":
-/*!*************************************!*\
-  !*** ./node_modules/axios/index.js ***!
-  \*************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports = __webpack_require__(/*! ./lib/axios */ "./node_modules/axios/lib/axios.js");
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/adapters/xhr.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/adapters/xhr.js ***!
-  \************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/axios/lib/core/settle.js");
-var cookies = __webpack_require__(/*! ./../helpers/cookies */ "./node_modules/axios/lib/helpers/cookies.js");
-var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/axios/lib/helpers/buildURL.js");
-var buildFullPath = __webpack_require__(/*! ../core/buildFullPath */ "./node_modules/axios/lib/core/buildFullPath.js");
-var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/axios/lib/helpers/parseHeaders.js");
-var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/axios/lib/helpers/isURLSameOrigin.js");
-var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios/lib/core/createError.js");
-var transitionalDefaults = __webpack_require__(/*! ../defaults/transitional */ "./node_modules/axios/lib/defaults/transitional.js");
-var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-    var responseType = config.responseType;
-    var onCanceled;
-    function done() {
-      if (config.cancelToken) {
-        config.cancelToken.unsubscribe(onCanceled);
-      }
-
-      if (config.signal) {
-        config.signal.removeEventListener('abort', onCanceled);
-      }
-    }
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    var fullPath = buildFullPath(config.baseURL, config.url);
-    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    function onloadend() {
-      if (!request) {
-        return;
-      }
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
-        request.responseText : request.response;
-      var response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(function _resolve(value) {
-        resolve(value);
-        done();
-      }, function _reject(err) {
-        reject(err);
-        done();
-      }, response);
-
-      // Clean up request
-      request = null;
-    }
-
-    if ('onloadend' in request) {
-      // Use onloadend if available
-      request.onloadend = onloadend;
-    } else {
-      // Listen for ready state to emulate onloadend
-      request.onreadystatechange = function handleLoad() {
-        if (!request || request.readyState !== 4) {
-          return;
-        }
-
-        // The request errored out and we didn't get a response, this will be
-        // handled by onerror instead
-        // With one exception: request that using file: protocol, most browsers
-        // will return status as 0 even though it's a successful request
-        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-          return;
-        }
-        // readystate handler is calling before onerror or ontimeout handlers,
-        // so we should call onloadend on the next 'tick'
-        setTimeout(onloadend);
-      };
-    }
-
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
-        return;
-      }
-
-      reject(createError('Request aborted', config, 'ECONNABORTED', request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      var timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
-      var transitional = config.transitional || transitionalDefaults;
-      if (config.timeoutErrorMessage) {
-        timeoutErrorMessage = config.timeoutErrorMessage;
-      }
-      reject(createError(
-        timeoutErrorMessage,
-        config,
-        transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
-        cookies.read(config.xsrfCookieName) :
-        undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (!utils.isUndefined(config.withCredentials)) {
-      request.withCredentials = !!config.withCredentials;
-    }
-
-    // Add responseType to request if needed
-    if (responseType && responseType !== 'json') {
-      request.responseType = config.responseType;
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken || config.signal) {
-      // Handle cancellation
-      // eslint-disable-next-line func-names
-      onCanceled = function(cancel) {
-        if (!request) {
-          return;
-        }
-        reject(!cancel || (cancel && cancel.type) ? new Cancel('canceled') : cancel);
-        request.abort();
-        request = null;
-      };
-
-      config.cancelToken && config.cancelToken.subscribe(onCanceled);
-      if (config.signal) {
-        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
-      }
-    }
-
-    if (!requestData) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/axios.js":
-/*!*****************************************!*\
-  !*** ./node_modules/axios/lib/axios.js ***!
-  \*****************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-var Axios = __webpack_require__(/*! ./core/Axios */ "./node_modules/axios/lib/core/Axios.js");
-var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
-var defaults = __webpack_require__(/*! ./defaults */ "./node_modules/axios/lib/defaults/index.js");
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  // Factory for creating new instances
-  instance.create = function create(instanceConfig) {
-    return createInstance(mergeConfig(defaultConfig, instanceConfig));
-  };
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ "./node_modules/axios/lib/cancel/CancelToken.js");
-axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ "./node_modules/axios/lib/cancel/isCancel.js");
-axios.VERSION = (__webpack_require__(/*! ./env/data */ "./node_modules/axios/lib/env/data.js").version);
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = __webpack_require__(/*! ./helpers/spread */ "./node_modules/axios/lib/helpers/spread.js");
-
-// Expose isAxiosError
-axios.isAxiosError = __webpack_require__(/*! ./helpers/isAxiosError */ "./node_modules/axios/lib/helpers/isAxiosError.js");
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports["default"] = axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/Cancel.js":
-/*!*************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/Cancel.js ***!
-  \*************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/CancelToken.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/CancelToken.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Cancel = __webpack_require__(/*! ./Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-
-  // eslint-disable-next-line func-names
-  this.promise.then(function(cancel) {
-    if (!token._listeners) return;
-
-    var i;
-    var l = token._listeners.length;
-
-    for (i = 0; i < l; i++) {
-      token._listeners[i](cancel);
-    }
-    token._listeners = null;
-  });
-
-  // eslint-disable-next-line func-names
-  this.promise.then = function(onfulfilled) {
-    var _resolve;
-    // eslint-disable-next-line func-names
-    var promise = new Promise(function(resolve) {
-      token.subscribe(resolve);
-      _resolve = resolve;
-    }).then(onfulfilled);
-
-    promise.cancel = function reject() {
-      token.unsubscribe(_resolve);
-    };
-
-    return promise;
-  };
-
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Subscribe to the cancel signal
- */
-
-CancelToken.prototype.subscribe = function subscribe(listener) {
-  if (this.reason) {
-    listener(this.reason);
-    return;
-  }
-
-  if (this._listeners) {
-    this._listeners.push(listener);
-  } else {
-    this._listeners = [listener];
-  }
-};
-
-/**
- * Unsubscribe from the cancel signal
- */
-
-CancelToken.prototype.unsubscribe = function unsubscribe(listener) {
-  if (!this._listeners) {
-    return;
-  }
-  var index = this._listeners.indexOf(listener);
-  if (index !== -1) {
-    this._listeners.splice(index, 1);
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/isCancel.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/isCancel.js ***!
-  \***************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/Axios.js":
-/*!**********************************************!*\
-  !*** ./node_modules/axios/lib/core/Axios.js ***!
-  \**********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/axios/lib/helpers/buildURL.js");
-var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios/lib/core/InterceptorManager.js");
-var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios/lib/core/dispatchRequest.js");
-var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
-var validator = __webpack_require__(/*! ../helpers/validator */ "./node_modules/axios/lib/helpers/validator.js");
-
-var validators = validator.validators;
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(configOrUrl, config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof configOrUrl === 'string') {
-    config = config || {};
-    config.url = configOrUrl;
-  } else {
-    config = configOrUrl || {};
-  }
-
-  config = mergeConfig(this.defaults, config);
-
-  // Set config.method
-  if (config.method) {
-    config.method = config.method.toLowerCase();
-  } else if (this.defaults.method) {
-    config.method = this.defaults.method.toLowerCase();
-  } else {
-    config.method = 'get';
-  }
-
-  var transitional = config.transitional;
-
-  if (transitional !== undefined) {
-    validator.assertOptions(transitional, {
-      silentJSONParsing: validators.transitional(validators.boolean),
-      forcedJSONParsing: validators.transitional(validators.boolean),
-      clarifyTimeoutError: validators.transitional(validators.boolean)
-    }, false);
-  }
-
-  // filter out skipped interceptors
-  var requestInterceptorChain = [];
-  var synchronousRequestInterceptors = true;
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
-      return;
-    }
-
-    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
-
-    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  var responseInterceptorChain = [];
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  var promise;
-
-  if (!synchronousRequestInterceptors) {
-    var chain = [dispatchRequest, undefined];
-
-    Array.prototype.unshift.apply(chain, requestInterceptorChain);
-    chain = chain.concat(responseInterceptorChain);
-
-    promise = Promise.resolve(config);
-    while (chain.length) {
-      promise = promise.then(chain.shift(), chain.shift());
-    }
-
-    return promise;
-  }
-
-
-  var newConfig = config;
-  while (requestInterceptorChain.length) {
-    var onFulfilled = requestInterceptorChain.shift();
-    var onRejected = requestInterceptorChain.shift();
-    try {
-      newConfig = onFulfilled(newConfig);
-    } catch (error) {
-      onRejected(error);
-      break;
-    }
-  }
-
-  try {
-    promise = dispatchRequest(newConfig);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-
-  while (responseInterceptorChain.length) {
-    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
-  }
-
-  return promise;
-};
-
-Axios.prototype.getUri = function getUri(config) {
-  config = mergeConfig(this.defaults, config);
-  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: (config || {}).data
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/InterceptorManager.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios/lib/core/InterceptorManager.js ***!
-  \***********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected,
-    synchronous: options ? options.synchronous : false,
-    runWhen: options ? options.runWhen : null
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/buildFullPath.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/core/buildFullPath.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var isAbsoluteURL = __webpack_require__(/*! ../helpers/isAbsoluteURL */ "./node_modules/axios/lib/helpers/isAbsoluteURL.js");
-var combineURLs = __webpack_require__(/*! ../helpers/combineURLs */ "./node_modules/axios/lib/helpers/combineURLs.js");
-
-/**
- * Creates a new URL by combining the baseURL with the requestedURL,
- * only when the requestedURL is not already an absolute URL.
- * If the requestURL is absolute, this function returns the requestedURL untouched.
- *
- * @param {string} baseURL The base URL
- * @param {string} requestedURL Absolute or relative URL to combine
- * @returns {string} The combined full path
- */
-module.exports = function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
-    return combineURLs(baseURL, requestedURL);
-  }
-  return requestedURL;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/createError.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/core/createError.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(/*! ./enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/dispatchRequest.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/core/dispatchRequest.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var transformData = __webpack_require__(/*! ./transformData */ "./node_modules/axios/lib/core/transformData.js");
-var isCancel = __webpack_require__(/*! ../cancel/isCancel */ "./node_modules/axios/lib/cancel/isCancel.js");
-var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/axios/lib/defaults/index.js");
-var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-
-  if (config.signal && config.signal.aborted) {
-    throw new Cancel('canceled');
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData.call(
-    config,
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData.call(
-      config,
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData.call(
-          config,
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/enhanceError.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/axios/lib/core/enhanceError.js ***!
-  \*****************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-
-  error.request = request;
-  error.response = response;
-  error.isAxiosError = true;
-
-  error.toJSON = function toJSON() {
-    return {
-      // Standard
-      message: this.message,
-      name: this.name,
-      // Microsoft
-      description: this.description,
-      number: this.number,
-      // Mozilla
-      fileName: this.fileName,
-      lineNumber: this.lineNumber,
-      columnNumber: this.columnNumber,
-      stack: this.stack,
-      // Axios
-      config: this.config,
-      code: this.code,
-      status: this.response && this.response.status ? this.response.status : null
-    };
-  };
-  return error;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/mergeConfig.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/core/mergeConfig.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
-
-/**
- * Config-specific merge-function which creates a new config-object
- * by merging two configuration objects together.
- *
- * @param {Object} config1
- * @param {Object} config2
- * @returns {Object} New object resulting from merging config2 to config1
- */
-module.exports = function mergeConfig(config1, config2) {
-  // eslint-disable-next-line no-param-reassign
-  config2 = config2 || {};
-  var config = {};
-
-  function getMergedValue(target, source) {
-    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
-      return utils.merge(target, source);
-    } else if (utils.isPlainObject(source)) {
-      return utils.merge({}, source);
-    } else if (utils.isArray(source)) {
-      return source.slice();
-    }
-    return source;
-  }
-
-  // eslint-disable-next-line consistent-return
-  function mergeDeepProperties(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(config1[prop], config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function valueFromConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(undefined, config2[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function defaultToConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(undefined, config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function mergeDirectKeys(prop) {
-    if (prop in config2) {
-      return getMergedValue(config1[prop], config2[prop]);
-    } else if (prop in config1) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  var mergeMap = {
-    'url': valueFromConfig2,
-    'method': valueFromConfig2,
-    'data': valueFromConfig2,
-    'baseURL': defaultToConfig2,
-    'transformRequest': defaultToConfig2,
-    'transformResponse': defaultToConfig2,
-    'paramsSerializer': defaultToConfig2,
-    'timeout': defaultToConfig2,
-    'timeoutMessage': defaultToConfig2,
-    'withCredentials': defaultToConfig2,
-    'adapter': defaultToConfig2,
-    'responseType': defaultToConfig2,
-    'xsrfCookieName': defaultToConfig2,
-    'xsrfHeaderName': defaultToConfig2,
-    'onUploadProgress': defaultToConfig2,
-    'onDownloadProgress': defaultToConfig2,
-    'decompress': defaultToConfig2,
-    'maxContentLength': defaultToConfig2,
-    'maxBodyLength': defaultToConfig2,
-    'transport': defaultToConfig2,
-    'httpAgent': defaultToConfig2,
-    'httpsAgent': defaultToConfig2,
-    'cancelToken': defaultToConfig2,
-    'socketPath': defaultToConfig2,
-    'responseEncoding': defaultToConfig2,
-    'validateStatus': mergeDirectKeys
-  };
-
-  utils.forEach(Object.keys(config1).concat(Object.keys(config2)), function computeConfigValue(prop) {
-    var merge = mergeMap[prop] || mergeDeepProperties;
-    var configValue = merge(prop);
-    (utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
-  });
-
-  return config;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/settle.js":
-/*!***********************************************!*\
-  !*** ./node_modules/axios/lib/core/settle.js ***!
-  \***********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var createError = __webpack_require__(/*! ./createError */ "./node_modules/axios/lib/core/createError.js");
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/transformData.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/core/transformData.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/axios/lib/defaults/index.js");
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  var context = this || defaults;
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn.call(context, data, headers);
-  });
-
-  return data;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/defaults/index.js":
-/*!**************************************************!*\
-  !*** ./node_modules/axios/lib/defaults/index.js ***!
-  \**************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
-var normalizeHeaderName = __webpack_require__(/*! ../helpers/normalizeHeaderName */ "./node_modules/axios/lib/helpers/normalizeHeaderName.js");
-var enhanceError = __webpack_require__(/*! ../core/enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
-var transitionalDefaults = __webpack_require__(/*! ./transitional */ "./node_modules/axios/lib/defaults/transitional.js");
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(/*! ../adapters/xhr */ "./node_modules/axios/lib/adapters/xhr.js");
-  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(/*! ../adapters/http */ "./node_modules/axios/lib/adapters/xhr.js");
-  }
-  return adapter;
-}
-
-function stringifySafely(rawValue, parser, encoder) {
-  if (utils.isString(rawValue)) {
-    try {
-      (parser || JSON.parse)(rawValue);
-      return utils.trim(rawValue);
-    } catch (e) {
-      if (e.name !== 'SyntaxError') {
-        throw e;
-      }
-    }
-  }
-
-  return (encoder || JSON.stringify)(rawValue);
-}
-
-var defaults = {
-
-  transitional: transitionalDefaults,
-
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Accept');
-    normalizeHeaderName(headers, 'Content-Type');
-
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data) || (headers && headers['Content-Type'] === 'application/json')) {
-      setContentTypeIfUnset(headers, 'application/json');
-      return stringifySafely(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    var transitional = this.transitional || defaults.transitional;
-    var silentJSONParsing = transitional && transitional.silentJSONParsing;
-    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
-    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
-
-    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        if (strictJSONParsing) {
-          if (e.name === 'SyntaxError') {
-            throw enhanceError(e, this, 'E_JSON_PARSE');
-          }
-          throw e;
-        }
-      }
-    }
-
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-  maxBodyLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  },
-
-  headers: {
-    common: {
-      'Accept': 'application/json, text/plain, */*'
-    }
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/defaults/transitional.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/axios/lib/defaults/transitional.js ***!
-  \*********************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = {
-  silentJSONParsing: true,
-  forcedJSONParsing: true,
-  clarifyTimeoutError: false
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/env/data.js":
-/*!********************************************!*\
-  !*** ./node_modules/axios/lib/env/data.js ***!
-  \********************************************/
-/***/ ((module) => {
-
-module.exports = {
-  "version": "0.26.1"
-};
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/bind.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/bind.js ***!
-  \************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/buildURL.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/buildURL.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    var hashmarkIndex = url.indexOf('#');
-    if (hashmarkIndex !== -1) {
-      url = url.slice(0, hashmarkIndex);
-    }
-
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/combineURLs.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/combineURLs.js ***!
-  \*******************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/cookies.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/cookies.js ***!
-  \***************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-    (function standardBrowserEnv() {
-      return {
-        write: function write(name, value, expires, path, domain, secure) {
-          var cookie = [];
-          cookie.push(name + '=' + encodeURIComponent(value));
-
-          if (utils.isNumber(expires)) {
-            cookie.push('expires=' + new Date(expires).toGMTString());
-          }
-
-          if (utils.isString(path)) {
-            cookie.push('path=' + path);
-          }
-
-          if (utils.isString(domain)) {
-            cookie.push('domain=' + domain);
-          }
-
-          if (secure === true) {
-            cookie.push('secure');
-          }
-
-          document.cookie = cookie.join('; ');
-        },
-
-        read: function read(name) {
-          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-          return (match ? decodeURIComponent(match[3]) : null);
-        },
-
-        remove: function remove(name) {
-          this.write(name, '', Date.now() - 86400000);
-        }
-      };
-    })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return {
-        write: function write() {},
-        read: function read() { return null; },
-        remove: function remove() {}
-      };
-    })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isAbsoluteURL.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isAbsoluteURL.js ***!
-  \*********************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isAxiosError.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isAxiosError.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-/**
- * Determines whether the payload is an error thrown by Axios
- *
- * @param {*} payload The value to test
- * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
- */
-module.exports = function isAxiosError(payload) {
-  return utils.isObject(payload) && (payload.isAxiosError === true);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isURLSameOrigin.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isURLSameOrigin.js ***!
-  \***********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-    (function standardBrowserEnv() {
-      var msie = /(msie|trident)/i.test(navigator.userAgent);
-      var urlParsingNode = document.createElement('a');
-      var originURL;
-
-      /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-      function resolveURL(url) {
-        var href = url;
-
-        if (msie) {
-        // IE needs attribute set twice to normalize properties
-          urlParsingNode.setAttribute('href', href);
-          href = urlParsingNode.href;
-        }
-
-        urlParsingNode.setAttribute('href', href);
-
-        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-        return {
-          href: urlParsingNode.href,
-          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-          host: urlParsingNode.host,
-          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-          hostname: urlParsingNode.hostname,
-          port: urlParsingNode.port,
-          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-            urlParsingNode.pathname :
-            '/' + urlParsingNode.pathname
-        };
-      }
-
-      originURL = resolveURL(window.location.href);
-
-      /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-      return function isURLSameOrigin(requestURL) {
-        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-        return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-      };
-    })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return function isURLSameOrigin() {
-        return true;
-      };
-    })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/normalizeHeaderName.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/normalizeHeaderName.js ***!
-  \***************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/parseHeaders.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/parseHeaders.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
-  });
-
-  return parsed;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/spread.js":
-/*!**************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/spread.js ***!
-  \**************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/validator.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/validator.js ***!
-  \*****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var VERSION = (__webpack_require__(/*! ../env/data */ "./node_modules/axios/lib/env/data.js").version);
-
-var validators = {};
-
-// eslint-disable-next-line func-names
-['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
-  validators[type] = function validator(thing) {
-    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
-  };
-});
-
-var deprecatedWarnings = {};
-
-/**
- * Transitional option validator
- * @param {function|boolean?} validator - set to false if the transitional option has been removed
- * @param {string?} version - deprecated version / removed since version
- * @param {string?} message - some message with additional info
- * @returns {function}
- */
-validators.transitional = function transitional(validator, version, message) {
-  function formatMessage(opt, desc) {
-    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
-  }
-
-  // eslint-disable-next-line func-names
-  return function(value, opt, opts) {
-    if (validator === false) {
-      throw new Error(formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')));
-    }
-
-    if (version && !deprecatedWarnings[opt]) {
-      deprecatedWarnings[opt] = true;
-      // eslint-disable-next-line no-console
-      console.warn(
-        formatMessage(
-          opt,
-          ' has been deprecated since v' + version + ' and will be removed in the near future'
-        )
-      );
-    }
-
-    return validator ? validator(value, opt, opts) : true;
-  };
-};
-
-/**
- * Assert object's properties type
- * @param {object} options
- * @param {object} schema
- * @param {boolean?} allowUnknown
- */
-
-function assertOptions(options, schema, allowUnknown) {
-  if (typeof options !== 'object') {
-    throw new TypeError('options must be an object');
-  }
-  var keys = Object.keys(options);
-  var i = keys.length;
-  while (i-- > 0) {
-    var opt = keys[i];
-    var validator = schema[opt];
-    if (validator) {
-      var value = options[opt];
-      var result = value === undefined || validator(value, opt, options);
-      if (result !== true) {
-        throw new TypeError('option ' + opt + ' must be ' + result);
-      }
-      continue;
-    }
-    if (allowUnknown !== true) {
-      throw Error('Unknown option ' + opt);
-    }
-  }
-}
-
-module.exports = {
-  assertOptions: assertOptions,
-  validators: validators
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/utils.js":
-/*!*****************************************!*\
-  !*** ./node_modules/axios/lib/utils.js ***!
-  \*****************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return Array.isArray(val);
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is a Buffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Buffer, otherwise false
- */
-function isBuffer(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
-    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return toString.call(val) === '[object FormData]';
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (isArrayBuffer(val.buffer));
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a plain Object
- *
- * @param {Object} val The value to test
- * @return {boolean} True if value is a plain Object, otherwise false
- */
-function isPlainObject(val) {
-  if (toString.call(val) !== '[object Object]') {
-    return false;
-  }
-
-  var prototype = Object.getPrototypeOf(val);
-  return prototype === null || prototype === Object.prototype;
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return toString.call(val) === '[object URLSearchParams]';
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- * nativescript
- *  navigator.product -> 'NativeScript' or 'NS'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
-                                           navigator.product === 'NativeScript' ||
-                                           navigator.product === 'NS')) {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (isPlainObject(result[key]) && isPlainObject(val)) {
-      result[key] = merge(result[key], val);
-    } else if (isPlainObject(val)) {
-      result[key] = merge({}, val);
-    } else if (isArray(val)) {
-      result[key] = val.slice();
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-/**
- * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
- *
- * @param {string} content with BOM
- * @return {string} content value without BOM
- */
-function stripBOM(content) {
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1);
-  }
-  return content;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isPlainObject: isPlainObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim,
-  stripBOM: stripBOM
-};
-
-
-/***/ }),
 
 /***/ "./node_modules/css-loader/dist/cjs.js!./src/css/chargePage.css":
 /*!**********************************************************************!*\
@@ -2169,7 +8,6 @@ module.exports = {
   \**********************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2196,7 +34,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".charge-control-input {\n  width: 300p
   \*****************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2222,7 +59,7 @@ ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_chargePage_css__W
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_purchasePage_css__WEBPACK_IMPORTED_MODULE_4__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_memberPage_css__WEBPACK_IMPORTED_MODULE_5__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }", "",{"version":3,"sources":["webpack://./src/css/index.css"],"names":[],"mappings":"AAKA;EACE,aAAa;EACb,sBAAsB;EACtB,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,iBAAiB;AACnB;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,gBAAgB;AAClB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,iBAAiB;EACjB,eAAe;EACf,sBAAsB;AACxB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,aAAa;AACf;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,qBAAqB;AACvB;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;EACZ,iBAAiB;EACjB,YAAY;EACZ,eAAe;AACjB;;AAEA;;;;EAIE,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;;;;;;;;EAQE,YAAY;EACZ,YAAY;EACZ,6BAA6B;EAC7B,gCAAgC;AAClC;;AAEA;;;EAGE,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;AACd;;AAEA;;EAEE,WAAW;AACb;;AAEA;;;EAGE,mBAAmB;AACrB;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,eAAe;EACf,YAAY;EACZ,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;AAC3B;;AAEA;EACE,cAAc;EACd,iBAAiB;EACjB,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;AACzB;;AAEA,uBAAuB,OAAO,UAAU,EAAE,EAAE,KAAK,UAAU,EAAE,EAAE","sourcesContent":["@import \"./productPage.css\";\n@import \"./chargePage.css\";\n@import \"./purchasePage.css\";\n@import \"./memberPage.css\";\n\n#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }", "",{"version":3,"sources":["webpack://./src/css/index.css"],"names":[],"mappings":"AAKA;EACE,aAAa;EACb,sBAAsB;EACtB,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,iBAAiB;AACnB;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,gBAAgB;AAClB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,iBAAiB;EACjB,eAAe;EACf,sBAAsB;AACxB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,aAAa;AACf;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,qBAAqB;AACvB;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,kBAAkB;AACpB;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,mBAAmB;EACnB,yBAAyB;EACzB,cAAc;EACd,kBAAkB;EAClB,gBAAgB;EAChB,eAAe;EACf,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;EAEE,WAAW;EACX,cAAc;EACd,gBAAgB;EAChB;AACF;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;EACZ,iBAAiB;EACjB,YAAY;EACZ,eAAe;AACjB;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;;;EAIE,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;;;;;;;;EAQE,YAAY;EACZ,YAAY;EACZ,6BAA6B;EAC7B,gCAAgC;AAClC;;AAEA;;;EAGE,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;AACd;;AAEA;;EAEE,WAAW;AACb;;AAEA;;;EAGE,mBAAmB;AACrB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,eAAe;EACf,YAAY;EACZ,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;AAC3B;;AAEA;EACE,cAAc;EACd,iBAAiB;EACjB,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;AACzB;;AAEA,uBAAuB,OAAO,UAAU,EAAE,EAAE,KAAK,UAAU,EAAE,EAAE","sourcesContent":["@import \"./productPage.css\";\n@import \"./chargePage.css\";\n@import \"./purchasePage.css\";\n@import \"./memberPage.css\";\n\n#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2235,7 +72,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, "#app {\n  display: flex;\n  flex-direc
   \**********************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2249,7 +85,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#login-section,\n#signup-section {\n  display: flex;\n  flex-direction: column;\n  margin-top: 30px;\n}\n\n.member-page-main-text,\n.member-page-main-text {\n  margin: auto;\n  margin-bottom: 48px;\n}\n\n.member-info-form {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.member-info-form-label {\n  width: 290px;\n  float: left;\n}\n\n.member-info-input {\n  width: 290px;\n  height: 36px;\n  margin: 4px 0 4px 0;\n  border: 1px solid #b7b7b7;\n  border-radius: 6px;\n  padding-left: 10px;\n}\n\n.member-info-message{\n  width: 290px;\n  height: 18px;\n  margin: 0 0 14px 0;\n  font-size: 14px;\n}\n\n.member-confirm-button {\n  width: 300px;\n  height: 36px;\n  background-color: #00BCD4;\n  border-radius: 6px;\n  color: #ffffff;\n  cursor: pointer;\n}\n\n.member-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.signup-text{\n  cursor: pointer;\n  color: #3581D7;\n}\n\n.member-info-error-text {\n  color: #ff0000;\n}\n\n.member-info-correct-text {\n  color: #009eb3;\n}", "",{"version":3,"sources":["webpack://./src/css/memberPage.css"],"names":[],"mappings":"AAAA;;EAEE,aAAa;EACb,sBAAsB;EACtB,gBAAgB;AAClB;;AAEA;;EAEE,YAAY;EACZ,mBAAmB;AACrB;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,mBAAmB;AACrB;;AAEA;EACE,YAAY;EACZ,WAAW;AACb;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,yBAAyB;EACzB,kBAAkB;EAClB,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,kBAAkB;EAClB,eAAe;AACjB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;EACzB,kBAAkB;EAClB,cAAc;EACd,eAAe;AACjB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,cAAc;AAChB;;AAEA;EACE,cAAc;AAChB;;AAEA;EACE,cAAc;AAChB","sourcesContent":["#login-section,\n#signup-section {\n  display: flex;\n  flex-direction: column;\n  margin-top: 30px;\n}\n\n.member-page-main-text,\n.member-page-main-text {\n  margin: auto;\n  margin-bottom: 48px;\n}\n\n.member-info-form {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.member-info-form-label {\n  width: 290px;\n  float: left;\n}\n\n.member-info-input {\n  width: 290px;\n  height: 36px;\n  margin: 4px 0 4px 0;\n  border: 1px solid #b7b7b7;\n  border-radius: 6px;\n  padding-left: 10px;\n}\n\n.member-info-message{\n  width: 290px;\n  height: 18px;\n  margin: 0 0 14px 0;\n  font-size: 14px;\n}\n\n.member-confirm-button {\n  width: 300px;\n  height: 36px;\n  background-color: #00BCD4;\n  border-radius: 6px;\n  color: #ffffff;\n  cursor: pointer;\n}\n\n.member-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.signup-text{\n  cursor: pointer;\n  color: #3581D7;\n}\n\n.member-info-error-text {\n  color: #ff0000;\n}\n\n.member-info-correct-text {\n  color: #009eb3;\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#login-section,\n#signup-section,\n#edit-member-info-section {\n  display: flex;\n  flex-direction: column;\n  margin-top: 30px;\n}\n\n.member-page-main-text,\n.member-page-main-text,\n.edit-member-info-text {\n  margin: auto;\n  margin-bottom: 48px;\n}\n\n.member-info-form {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.member-info-form-label {\n  width: 290px;\n  float: left;\n}\n\n.member-info-input {\n  width: 290px;\n  height: 36px;\n  margin: 4px 0 4px 0;\n  border: 1px solid #b7b7b7;\n  border-radius: 6px;\n  padding-left: 10px;\n}\n\n.member-info-message{\n  width: 290px;\n  height: 18px;\n  margin: 0 0 14px 0;\n  font-size: 14px;\n}\n\n.member-confirm-button {\n  width: 300px;\n  height: 36px;\n  background-color: #00BCD4;\n  border-radius: 6px;\n  color: #ffffff;\n  cursor: pointer;\n}\n\n.member-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.signup-text{\n  cursor: pointer;\n  color: #3581D7;\n}\n\n.member-info-error-text {\n  color: #ff0000;\n}\n\n.member-info-correct-text {\n  color: #009eb3;\n}", "",{"version":3,"sources":["webpack://./src/css/memberPage.css"],"names":[],"mappings":"AAAA;;;EAGE,aAAa;EACb,sBAAsB;EACtB,gBAAgB;AAClB;;AAEA;;;EAGE,YAAY;EACZ,mBAAmB;AACrB;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,mBAAmB;AACrB;;AAEA;EACE,YAAY;EACZ,WAAW;AACb;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,yBAAyB;EACzB,kBAAkB;EAClB,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,kBAAkB;EAClB,eAAe;AACjB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;EACzB,kBAAkB;EAClB,cAAc;EACd,eAAe;AACjB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,cAAc;AAChB;;AAEA;EACE,cAAc;AAChB;;AAEA;EACE,cAAc;AAChB","sourcesContent":["#login-section,\n#signup-section,\n#edit-member-info-section {\n  display: flex;\n  flex-direction: column;\n  margin-top: 30px;\n}\n\n.member-page-main-text,\n.member-page-main-text,\n.edit-member-info-text {\n  margin: auto;\n  margin-bottom: 48px;\n}\n\n.member-info-form {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.member-info-form-label {\n  width: 290px;\n  float: left;\n}\n\n.member-info-input {\n  width: 290px;\n  height: 36px;\n  margin: 4px 0 4px 0;\n  border: 1px solid #b7b7b7;\n  border-radius: 6px;\n  padding-left: 10px;\n}\n\n.member-info-message{\n  width: 290px;\n  height: 18px;\n  margin: 0 0 14px 0;\n  font-size: 14px;\n}\n\n.member-confirm-button {\n  width: 300px;\n  height: 36px;\n  background-color: #00BCD4;\n  border-radius: 6px;\n  color: #ffffff;\n  cursor: pointer;\n}\n\n.member-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.signup-text{\n  cursor: pointer;\n  color: #3581D7;\n}\n\n.member-info-error-text {\n  color: #ff0000;\n}\n\n.member-info-correct-text {\n  color: #009eb3;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2262,7 +98,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, "#login-section,\n#signup-section {\n  
   \***********************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2289,7 +124,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".product-control-input {\n  width: 120
   \************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2316,7 +150,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, "#insert-money-form-wrap {\n  width: 38
   \*****************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 /*
@@ -2428,7 +261,6 @@ module.exports = function (cssWithMappingToString) {
   \************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 module.exports = function (item) {
@@ -2460,7 +292,6 @@ module.exports = function (item) {
   \***************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2515,7 +346,6 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
   \****************************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 var stylesInDOM = [];
@@ -2629,7 +459,6 @@ module.exports = function (list, options) {
   \********************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 var memo = {};
@@ -2678,7 +507,6 @@ module.exports = insertBySelector;
   \**********************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -2699,7 +527,6 @@ module.exports = insertStyleElement;
   \**********************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -2721,7 +548,6 @@ module.exports = setAttributesWithoutAttributes;
   \***************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -2801,7 +627,6 @@ module.exports = domAPI;
   \*********************************************************************/
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -2827,7 +652,6 @@ module.exports = styleTagTransform;
   \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2837,9 +661,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _product_Product__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./product/Product */ "./src/ts/components/product/Product.ts");
 /* harmony import */ var _purchase_Purchase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./purchase/Purchase */ "./src/ts/components/purchase/Purchase.ts");
 /* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/dom */ "./src/ts/utils/dom.ts");
-/* harmony import */ var _menuTab_menuTabTemplate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./menuTab/menuTabTemplate */ "./src/ts/components/menuTab/menuTabTemplate.ts");
-/* harmony import */ var _login_login__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./login/login */ "./src/ts/components/login/login.ts");
-/* harmony import */ var _signup_Signup__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./signup/Signup */ "./src/ts/components/signup/Signup.ts");
+/* harmony import */ var _login_login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./login/login */ "./src/ts/components/login/login.ts");
+/* harmony import */ var _signup_Signup__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./signup/Signup */ "./src/ts/components/signup/Signup.ts");
+/* harmony import */ var _editMember_EditMember__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./editMember/EditMember */ "./src/ts/components/editMember/EditMember.ts");
 
 
 
@@ -2855,6 +679,7 @@ var Vendingmachine = /** @class */ (function () {
             var routes = {
                 "#login": function () { return _this.login.render(); },
                 "#signup": function () { return _this.signup.render(); },
+                "#editMember": function () { return _this.editMember.render(); },
                 "#product": function () { return _this.product.render(); },
                 "#charge": function () { return _this.charge.render(); },
                 "#purchase": function () { return _this.purchase.render(); }
@@ -2863,15 +688,16 @@ var Vendingmachine = /** @class */ (function () {
             routes[path]();
         };
         var vendingmachineWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_4__.selectDom)("#app");
-        vendingmachineWrap.insertAdjacentHTML("beforeend", "\n        <aside id=\"snackbar-wrap\"></aside>\n        <header class=\"header\">\n          <h1 class=\"header-text\">\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> \n          <div class=\"member-wrap\">\n            <button class=\"member-login-button\">\uB85C\uADF8\uC778</button>\n          </div>\n          ".concat(_menuTab_menuTabTemplate__WEBPACK_IMPORTED_MODULE_5__.menuTabTemplate, "\n        </header>\n        <main class=\"main\"></main>\n      "));
+        vendingmachineWrap.insertAdjacentHTML("beforeend", "<aside id=\"snackbar-wrap\"></aside>\n        <header class=\"header\">\n        </header>\n        <main class=\"main\"></main>");
         this.mountComponent();
         this.convertTemplate(location.hash || "#product");
         this.handleMenuStyle();
     }
     Vendingmachine.prototype.mountComponent = function () {
         var _this = this;
-        this.login = new _login_login__WEBPACK_IMPORTED_MODULE_6__["default"](this.convertTemplate);
-        this.signup = new _signup_Signup__WEBPACK_IMPORTED_MODULE_7__["default"](this.convertTemplate);
+        this.login = new _login_login__WEBPACK_IMPORTED_MODULE_5__["default"](this.convertTemplate);
+        this.signup = new _signup_Signup__WEBPACK_IMPORTED_MODULE_6__["default"](this.convertTemplate);
+        this.editMember = new _editMember_EditMember__WEBPACK_IMPORTED_MODULE_7__["default"](this.convertTemplate);
         this.menuTab = new _menuTab_MenuTab__WEBPACK_IMPORTED_MODULE_1__["default"](this.convertTemplate);
         this.product = new _product_Product__WEBPACK_IMPORTED_MODULE_2__["default"]();
         this.charge = new _charge_Charge__WEBPACK_IMPORTED_MODULE_0__["default"]();
@@ -2905,7 +731,6 @@ var Vendingmachine = /** @class */ (function () {
   \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -2943,9 +768,11 @@ var Charge = /** @class */ (function () {
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.chargeForm, "submit", this.handleInputAmount);
     };
     Charge.prototype.render = function () {
-        this.chargeView.renderChargeView();
-        this.chargeView.showRandomChargeResult(this.chargeInfo.getCoinList(), this.chargeInfo.getTotalCharge());
-        this.bindChargeDom();
+        this.chargeView.renderChargeView(this.chargeInfo.getUserName());
+        if (this.chargeInfo.getUserName()) {
+            this.chargeView.showRandomChargeResult(this.chargeInfo.getCoinList(), this.chargeInfo.getTotalCharge());
+            this.bindChargeDom();
+        }
     };
     return Charge;
 }());
@@ -2960,7 +787,6 @@ var Charge = /** @class */ (function () {
   \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3003,6 +829,9 @@ var ChargeInfo = /** @class */ (function () {
     ChargeInfo.prototype.getTotalCharge = function () {
         return JSON.parse(localStorage.getItem("TOTAL_CHARGE")) || 0;
     };
+    ChargeInfo.prototype.getUserName = function () {
+        return JSON.parse(localStorage.getItem("USER_NAME"));
+    };
     return ChargeInfo;
 }());
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ChargeInfo);
@@ -3016,7 +845,6 @@ var ChargeInfo = /** @class */ (function () {
   \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3038,9 +866,9 @@ var ChargeView = /** @class */ (function () {
             return (coinCount.innerText = "".concat(chargeResult[index], "\uAC1C"));
         });
     };
-    ChargeView.prototype.renderChargeView = function () {
+    ChargeView.prototype.renderChargeView = function (userName) {
         this.vendingmachineFunctionWrap.replaceChildren();
-        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", _chargeTemplate__WEBPACK_IMPORTED_MODULE_1__.chargeTemplate);
+        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", userName ? _chargeTemplate__WEBPACK_IMPORTED_MODULE_1__.chargeTemplate : _chargeTemplate__WEBPACK_IMPORTED_MODULE_1__.chargeSectionNoAuthority);
     };
     return ChargeView;
 }());
@@ -3055,12 +883,255 @@ var ChargeView = /** @class */ (function () {
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "chargeTemplate": () => (/* binding */ chargeTemplate)
+/* harmony export */   "chargeTemplate": () => (/* binding */ chargeTemplate),
+/* harmony export */   "chargeSectionNoAuthority": () => (/* binding */ chargeSectionNoAuthority)
 /* harmony export */ });
 var chargeTemplate = "\n  <section id=\"charge-control-section\">\n    <div>\n      <form id=\"charge-control-form\">\n        <label>\uC790\uD310\uAE30\uAC00 \uBCF4\uC720\uD560 \uAE08\uC561\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694.</label>\n          <div>\n            <input type=\"number\" placeholder=\"\uAE08\uC561\" value=\"\" class=\"charge-control-input\" />\n            <button type=\"submit\" id=\"charge-add-button\">\uCDA9\uC804</button>\n          </div>\n      </form>  \n    </div>\n    <div>\n      <p>\uD604\uC7AC \uBCF4\uC720 \uAE08\uC561: <span id=\"current-contain-charge\"></span>\uC6D0</p>\n    </div>\n    <div>\n      <h1 id=\"charge-table-title\">\uC790\uD310\uAE30\uAC00 \uBCF4\uC720\uD55C \uB3D9\uC804</h1>\n      <table id=\"charge-control-table\">\n        <tr> \n          <th>\uB3D9\uC804</th>\n          <th>\uAC1C\uC218</th>\n        </tr>\n        <tr>\n          <td>500\uC6D0</td>\n          <td class=\"charge-coin-count\">0\uAC1C</td>\n        </tr>\n        <tr>\n          <td>100\uC6D0</td>\n          <td class=\"charge-coin-count\">0\uAC1C</td>\n        </tr>\n        <tr>\n          <td>50\uC6D0</td>\n          <td class=\"charge-coin-count\">0\uAC1C</td>\n        </tr>\n        <tr>\n          <td>10\uC6D0</td>\n          <td class=\"charge-coin-count\">0\uAC1C</td>\n        </tr>\n      </table>\n    </div>\n  </section>";
+var chargeSectionNoAuthority = "<p>\uC811\uADFC \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.</p>";
+
+
+
+/***/ }),
+
+/***/ "./src/ts/components/editMember/EditMember.ts":
+/*!****************************************************!*\
+  !*** ./src/ts/components/editMember/EditMember.ts ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_validation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/validation */ "./src/ts/utils/validation.ts");
+/* harmony import */ var _snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../snackbar/snackbar */ "./src/ts/components/snackbar/snackbar.ts");
+/* harmony import */ var _editMemberInfoTemplate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editMemberInfoTemplate */ "./src/ts/components/editMember/editMemberInfoTemplate.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+
+
+var EditMember = /** @class */ (function () {
+    function EditMember(convertTemplate) {
+        var _this = this;
+        this.convertTemplate = convertTemplate;
+        this.bindEditDom = function () {
+            var signupForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".member-info-form");
+            _this.nameInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-input");
+            _this.passwordInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-input");
+            _this.passwordConfirmInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-input");
+            _this.nameInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-message");
+            _this.passwordInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-message");
+            _this.passwordConfirmInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-message");
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(signupForm, "submit", _this.handleSubmitEditMember);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.nameInfoInput, "keydown", _this.handleNameInputKeyEvent);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.nameInfoInput, "focusout", _this.handleNameInputMouseEvent);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.passwordInfoInput, "keydown", _this.handlePasswordInputKeyEvent);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.passwordInfoInput, "focusout", _this.handlePasswordInputMouseEvent);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.passwordConfirmInfoInput, "keydown", _this.handlePasswordConfirmInputKeyEvent);
+            (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.passwordConfirmInfoInput, "focusout", _this.handlePasswordConfirmInputMouseEvent);
+        };
+        this.handleSubmitEditMember = function (event) { return __awaiter(_this, void 0, void 0, function () {
+            var nameInputValue, passwordInputValue, passwordConfirmInputValue, response, data, _a, message;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        event.preventDefault();
+                        nameInputValue = this.nameInfoInput.value;
+                        passwordInputValue = this.passwordInfoInput.value;
+                        passwordConfirmInputValue = this.passwordConfirmInfoInput.value;
+                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, this.nameInfoMessage) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, this.passwordInfoMessage) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, this.passwordConfirmInfoMessage)) {
+                            return [2 /*return*/];
+                        }
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/users/".concat(this.getUserId()), {
+                                method: "PATCH",
+                                body: JSON.stringify({
+                                    name: nameInputValue,
+                                    password: passwordInputValue
+                                }),
+                                headers: {
+                                    "Content-Type": "application/json"
+                                }
+                            })];
+                    case 2:
+                        response = _b.sent();
+                        if (Math.floor(response.status / 100) !== 2) {
+                            throw Error("시스템에러 발생하였습니다. 잠시후 다시 시도해주세요.");
+                        }
+                        return [4 /*yield*/, response.json()];
+                    case 3:
+                        data = _b.sent();
+                        localStorage.setItem("USER_NAME", JSON.stringify(data.name));
+                        history.pushState({ path: "#product" }, null, "#product");
+                        this.convertTemplate("#product");
+                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)("수정을 완료하였습니다.");
+                        return [3 /*break*/, 5];
+                    case 4:
+                        _a = _b.sent();
+                        message = _a.message;
+                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)(message);
+                        return [2 /*return*/];
+                    case 5: return [2 /*return*/];
+                }
+            });
+        }); };
+        this.handlePasswordConfirmInputKeyEvent = function () {
+            var passwordConfirmInputValue = _this.passwordConfirmInfoInput.value;
+            if (passwordConfirmInputValue) {
+                _this.passwordConfirmInfoMessage.textContent = "";
+            }
+        };
+        this.handlePasswordConfirmInputMouseEvent = function () {
+            var passwordConfirmInputValue = _this.passwordConfirmInfoInput.value;
+            var passwordInputValue = _this.passwordInfoInput.value;
+            _this.passwordConfirmInfoMessage.classList.add("member-info-error-text");
+            _this.passwordConfirmInfoMessage.classList.remove("member-info-correct-text");
+            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, _this.passwordConfirmInfoMessage) === false) {
+                return;
+            }
+            _this.passwordConfirmInfoMessage.textContent = "비밀번호가 일치합니다!";
+            _this.passwordConfirmInfoMessage.classList.remove("member-info-error-text");
+            _this.passwordConfirmInfoMessage.classList.add("member-info-correct-text");
+        };
+        this.handlePasswordInputKeyEvent = function () {
+            var passwordInputValue = _this.passwordInfoInput.value;
+            if (passwordInputValue) {
+                _this.passwordInfoMessage.textContent = "";
+            }
+        };
+        this.handlePasswordInputMouseEvent = function () {
+            var passwordInputValue = _this.passwordInfoInput.value;
+            _this.passwordInfoMessage.classList.add("member-info-error-text");
+            _this.passwordInfoMessage.classList.remove("member-info-correct-text");
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, _this.passwordInfoMessage)) {
+                return;
+            }
+            if (passwordInputValue.length >= 8) {
+                _this.passwordInfoMessage.textContent = "안전한 비밀번호네요!";
+            }
+            if (passwordInputValue.length >= 12) {
+                _this.passwordInfoMessage.textContent = "매우 안전한 비밀번호네요!";
+            }
+            _this.passwordInfoMessage.classList.remove("member-info-error-text");
+            _this.passwordInfoMessage.classList.add("member-info-correct-text");
+        };
+        this.handleNameInputKeyEvent = function () {
+            var nameInputValue = _this.nameInfoInput.value;
+            if (nameInputValue) {
+                _this.nameInfoMessage.textContent = "";
+            }
+        };
+        this.handleNameInputMouseEvent = function () {
+            var nameInputValue = _this.nameInfoInput.value;
+            _this.nameInfoMessage.classList.add("member-info-error-text");
+            _this.nameInfoMessage.classList.remove("member-info-correct-text");
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, _this.nameInfoMessage)) {
+                return;
+            }
+            _this.nameInfoMessage.textContent = "멋진 이름이네요!";
+            _this.nameInfoMessage.classList.remove("member-info-error-text");
+            _this.nameInfoMessage.classList.add("member-info-correct-text");
+        };
+        this.render = function () { return __awaiter(_this, void 0, void 0, function () {
+            var response, _a, email, name_1, _b, message;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _c.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/users/".concat(this.getUserId()), {
+                                method: "GET"
+                            })];
+                    case 1:
+                        response = _c.sent();
+                        if (Math.floor(response.status / 100) !== 2) {
+                            throw Error("시스템에러 발생하였습니다. 잠시후 다시 시도해주세요.");
+                        }
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        _a = _c.sent(), email = _a.email, name_1 = _a.name;
+                        this.vendingmachineFunctionWrap.replaceChildren();
+                        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_editMemberInfoTemplate__WEBPACK_IMPORTED_MODULE_3__.editMemberInfoTemplate)(email, name_1));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        _b = _c.sent();
+                        message = _b.message;
+                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)(message);
+                        return [2 /*return*/];
+                    case 4:
+                        this.bindEditDom();
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        this.convertTemplate = convertTemplate;
+        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
+    }
+    EditMember.prototype.getUserId = function () {
+        return JSON.parse(localStorage.getItem("USER_ID")) || 0;
+    };
+    return EditMember;
+}());
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (EditMember);
+
+
+/***/ }),
+
+/***/ "./src/ts/components/editMember/editMemberInfoTemplate.ts":
+/*!****************************************************************!*\
+  !*** ./src/ts/components/editMember/editMemberInfoTemplate.ts ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "editMemberInfoTemplate": () => (/* binding */ editMemberInfoTemplate)
+/* harmony export */ });
+var editMemberInfoTemplate = function (email, name) {
+    return "<section id=\"edit-member-info-section\">\n    <h1 class=\"edit-member-info-text\">\uD68C\uC6D0 \uC815\uBCF4 \uC218\uC815</h1>\n    <form class=\"member-info-form\" id=\"signup-form\">\n      <label class=\"member-info-form-label\">\uC774\uBA54\uC77C</label>\n      <input class=\"member-info-input disabled-input\" id=\"email-info-input\" placeholder=\"".concat(email, "\" type=\"text\" disabled />\n      <p class=\"member-info-message member-info-error-text\" id=\"email-info-message\"></p>\n      <label class=\"member-info-form-label\">\uC774\uB984</label>\n      <input class=\"member-info-input\" id=\"name-info-input\" placeholder=\"").concat(name, "\" type=\"text\" minlength=\"1\" />\n      <p class=\"member-info-message member-info-error-text \" id=\"name-info-message\"></p>\n      <label class=\"member-info-form-label\">\uBE44\uBC00\uBC88\uD638</label>\n      <input class=\"member-info-input\" id=\"password-info-input\" placeholder=\"\uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.\" type=\"password\" autocomplete=\"off\" minlength=\"8\" maxlength=\"16\" />\n      <p class=\"member-info-message member-info-error-text\" id=\"password-info-message\"></p>\n      <label class=\"member-info-form-label\">\uBE44\uBC00\uBC88\uD638 \uD655\uC778</label>\n      <input class=\"member-info-input\" id=\"password-confirm-info-input\" placeholder=\"\uBE44\uBC00\uBC88\uD638\uB97C \uB2E4\uC2DC \uC785\uB825\uD574\uC8FC\uC138\uC694\" type=\"password\" autocomplete=\"off\" minlength=\"8\" maxlength=\"16\" />\n      <p class=\"member-info-message member-info-error-text\" id=\"password-confirm-info-message\"></p>\n      <button class=\"member-confirm-button\" tpye=\"submit\">\uD655\uC778</button>\n    </form>\n  </section>\n");
+};
 
 
 
@@ -3072,14 +1143,12 @@ var chargeTemplate = "\n  <section id=\"charge-control-section\">\n    <div>\n  
   \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _utils_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/dom */ "./src/ts/utils/dom.ts");
+/* harmony import */ var _snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../snackbar/snackbar */ "./src/ts/components/snackbar/snackbar.ts");
 /* harmony import */ var _loginTemplate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./loginTemplate */ "./src/ts/components/login/loginTemplate.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3125,15 +1194,19 @@ var Login = /** @class */ (function () {
         var _this = this;
         this.convertTemplate = convertTemplate;
         this.handleLoginForm = function (event) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, emailInput, passwordInput, emailInputValue, passwordValue, response;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var _a, emailInput, passwordInput, emailInputValue, passwordValue, response, _b, accessToken, user, _c, message;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
                         event.preventDefault();
-                        _a = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.selectDomAll)(".member-info-input"), emailInput = _a[0], passwordInput = _a[1];
+                        _a = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".member-info-input"), emailInput = _a[0], passwordInput = _a[1];
                         emailInputValue = emailInput.value;
                         passwordValue = passwordInput.value;
-                        return [4 /*yield*/, axios__WEBPACK_IMPORTED_MODULE_0___default().post("https://vendingdb.herokuapp.com/login", {
+                        _d.label = 1;
+                    case 1:
+                        _d.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/login", {
+                                method: "POST",
                                 body: JSON.stringify({
                                     email: emailInputValue,
                                     password: passwordValue
@@ -3142,10 +1215,26 @@ var Login = /** @class */ (function () {
                                     "Content-Type": "application/json"
                                 }
                             })];
-                    case 1:
-                        response = _b.sent();
-                        console.log(response);
+                    case 2:
+                        response = _d.sent();
+                        if (Math.floor(response.status / 100) !== 2) {
+                            throw Error("가입된 계정이 없습니다.");
+                        }
+                        return [4 /*yield*/, response.json()];
+                    case 3:
+                        _b = _d.sent(), accessToken = _b.accessToken, user = _b.user;
+                        localStorage.setItem("ACCESS_TOKEN", JSON.stringify(accessToken));
+                        localStorage.setItem("USER_ID", JSON.stringify(user.id));
+                        localStorage.setItem("USER_NAME", JSON.stringify(user.name));
+                        history.pushState({ path: "#product" }, null, "#product");
+                        this.convertTemplate("#product");
+                        return [3 /*break*/, 5];
+                    case 4:
+                        _c = _d.sent();
+                        message = _c.message;
+                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__.showSnackbar)(message);
                         return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         }); };
@@ -3154,13 +1243,13 @@ var Login = /** @class */ (function () {
             _this.convertTemplate("#signup");
         };
         this.convertTemplate = convertTemplate;
-        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.selectDom)(".main");
+        this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
     }
     Login.prototype.bindLoginDom = function () {
-        var signupText = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.selectDom)(".signup-text");
-        var loginForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.selectDom)("#login-form");
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.addEvent)(signupText, "click", this.handleSignupText);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_1__.addEvent)(loginForm, "submit", this.handleLoginForm);
+        var signupText = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".signup-text");
+        var loginForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#login-form");
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(signupText, "click", this.handleSignupText);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(loginForm, "submit", this.handleLoginForm);
     };
     Login.prototype.render = function () {
         this.vendingmachineFunctionWrap.replaceChildren();
@@ -3180,7 +1269,6 @@ var Login = /** @class */ (function () {
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "loginTemplate": () => (/* binding */ loginTemplate)
@@ -3197,7 +1285,6 @@ var loginTemplate = "\n  <section id=\"login-section\">\n    <h1 class=\"member-
   \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3210,6 +1297,31 @@ var MenuTab = /** @class */ (function () {
     function MenuTab(convertTemplate) {
         var _this = this;
         this.convertTemplate = convertTemplate;
+        this.handleUserInfoSection = function (event) {
+            if (event.target.classList.contains("user-info-text")) {
+                _this.handleUserMenuTab();
+            }
+            else if (event.target.classList.contains("user-info-edit")) {
+                history.pushState({ path: "#editMember" }, null, "#editMember");
+                _this.convertTemplate("#editMember");
+            }
+            else if (event.target.classList.contains("user-logout")) {
+                _this.handleLogout();
+                _this.convertTemplate(location.hash);
+            }
+        };
+        this.handleLogout = function () {
+            localStorage.removeItem("ACCESS_TOKEN");
+            localStorage.removeItem("USER_ID");
+            localStorage.removeItem("USER_NAME");
+            _this.renderLogout();
+        };
+        this.handleUserMenuTab = function () {
+            var userInfoEditButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".user-info-edit");
+            var userLogoutButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".user-logout");
+            userInfoEditButton.classList.toggle("edit-button-animation");
+            userLogoutButton.classList.toggle("logout-button-animation");
+        };
         this.handleMemberLoginButton = function (event) {
             if (!event.target.classList.contains("member-login-button")) {
                 return;
@@ -3234,19 +1346,29 @@ var MenuTab = /** @class */ (function () {
             history.pushState({ path: e.target.dataset.menu }, null, e.target.dataset.menu);
             _this.convertTemplate(location.hash);
         };
+        this.renderLogout = function () {
+            _this.vendingmachineHeader.replaceChildren();
+            _this.vendingmachineHeader.insertAdjacentHTML("beforeend", "".concat(_this.renderVendingmachineHeader(JSON.parse(localStorage.getItem("USER_NAME")))));
+        };
+        this.renderVendingmachineHeader = function (userName) {
+            return "<h1 class=\"header-text\">\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> \n      <div class=\"member-wrap\">\n        ".concat(userName
+                ? "<div class=\"user-info-section\">\n              <div class=\"user-info-text\">\n                ".concat(userName.split("")[0], "\n              </div>\n              <button class=\"user-info-edit\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z\"/></svg>\n              </button>\n              <div class=\"user-logout\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M160 416H96c-17.67 0-32-14.33-32-32V128c0-17.67 14.33-32 32-32h64c17.67 0 32-14.33 32-32S177.7 32 160 32H96C42.98 32 0 74.98 0 128v256c0 53.02 42.98 96 96 96h64c17.67 0 32-14.33 32-32S177.7 416 160 416zM502.6 233.4l-128-128c-12.51-12.51-32.76-12.49-45.25 0c-12.5 12.5-12.5 32.75 0 45.25L402.8 224H192C174.3 224 160 238.3 160 256s14.31 32 32 32h210.8l-73.38 73.38c-12.5 12.5-12.5 32.75 0 45.25s32.75 12.5 45.25 0l128-128C515.1 266.1 515.1 245.9 502.6 233.4z\"/></svg>\n              </div>\n            </div>")
+                : "<button class=\"member-login-button\">\uB85C\uADF8\uC778</button>", "\n      </div>\n      ").concat(_menuTabTemplate__WEBPACK_IMPORTED_MODULE_1__.menuTabTemplate);
+        };
         this.convertTemplate = convertTemplate;
         this.vendingmachineWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#app");
         this.vendingmachineHeader = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".header");
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.vendingmachineWrap, "click", this.handleMenuTab);
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.vendingmachineHeader, "click", this.handleMemberLoginButton);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.vendingmachineHeader, "click", this.handleUserInfoSection);
     }
     MenuTab.prototype.render = function (path) {
-        if (path === "#login" || path === "#signup") {
+        if (path === "#login" || path === "#signup" || path === "#editMember") {
             this.vendingmachineHeader.replaceChildren();
             return;
         }
         if (this.vendingmachineHeader.children.length === 0) {
-            this.vendingmachineHeader.insertAdjacentHTML("beforeend", "<h1 class=\"header-text\">\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> \n          <div class=\"member-wrap\">\n            <button class=\"member-login-button\">\uB85C\uADF8\uC778</button>\n          </div>\n          ".concat(_menuTabTemplate__WEBPACK_IMPORTED_MODULE_1__.menuTabTemplate));
+            this.vendingmachineHeader.insertAdjacentHTML("beforeend", "".concat(this.renderVendingmachineHeader(JSON.parse(localStorage.getItem("USER_NAME")))));
         }
     };
     return MenuTab;
@@ -3262,7 +1384,6 @@ var MenuTab = /** @class */ (function () {
   \******************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "menuTabTemplate": () => (/* binding */ menuTabTemplate)
@@ -3279,7 +1400,6 @@ var menuTabTemplate = "\n  <nav class=\"nav\"> \n    <button type=\"button\" cla
   \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3349,7 +1469,7 @@ var Product = /** @class */ (function () {
         };
         this.productInfo = new _ProductInfo__WEBPACK_IMPORTED_MODULE_3__["default"]();
         this.productView = new _ProductView__WEBPACK_IMPORTED_MODULE_4__["default"]();
-        this.productView.renderProductView();
+        this.productView.renderProductView(this.productInfo.getUserName());
     }
     Product.prototype.bindProductDom = function () {
         this.productInfoInputs = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-control-input");
@@ -3360,9 +1480,11 @@ var Product = /** @class */ (function () {
         this.productView.focusProductNameInput();
     };
     Product.prototype.render = function () {
-        this.productView.renderProductView();
-        this.productView.showProductList(this.productInfo.getProductList());
-        this.bindProductDom();
+        this.productView.renderProductView(this.productInfo.getUserName());
+        if (this.productInfo.getUserName()) {
+            this.productView.showProductList(this.productInfo.getProductList());
+            this.bindProductDom();
+        }
     };
     return Product;
 }());
@@ -3377,7 +1499,6 @@ var Product = /** @class */ (function () {
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3437,6 +1558,9 @@ var ProductInfo = /** @class */ (function () {
     ProductInfo.prototype.getProductList = function () {
         return JSON.parse(localStorage.getItem("PRODUCTS")) || [];
     };
+    ProductInfo.prototype.getUserName = function () {
+        return JSON.parse(localStorage.getItem("USER_NAME")) || "";
+    };
     return ProductInfo;
 }());
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ProductInfo);
@@ -3450,7 +1574,6 @@ var ProductInfo = /** @class */ (function () {
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3506,9 +1629,9 @@ var ProductView = /** @class */ (function () {
         this.productTable.insertAdjacentHTML("beforeend", productList.map(function (product) { return (0,_productTemplate__WEBPACK_IMPORTED_MODULE_1__.addProductTemplate)(product); }).join(' '));
     };
     ;
-    ProductView.prototype.renderProductView = function () {
+    ProductView.prototype.renderProductView = function (userName) {
         this.vendingmachineFunctionWrap.replaceChildren();
-        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", _productTemplate__WEBPACK_IMPORTED_MODULE_1__.productTemplate);
+        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", userName ? _productTemplate__WEBPACK_IMPORTED_MODULE_1__.productTemplate : _productTemplate__WEBPACK_IMPORTED_MODULE_1__.productSectionNoAuthority);
         this.productTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-control-table");
     };
     return ProductView;
@@ -3524,12 +1647,12 @@ var ProductView = /** @class */ (function () {
   \******************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "productTemplate": () => (/* binding */ productTemplate),
 /* harmony export */   "addProductTemplate": () => (/* binding */ addProductTemplate),
-/* harmony export */   "editProductTemplate": () => (/* binding */ editProductTemplate)
+/* harmony export */   "editProductTemplate": () => (/* binding */ editProductTemplate),
+/* harmony export */   "productSectionNoAuthority": () => (/* binding */ productSectionNoAuthority)
 /* harmony export */ });
 var productTemplate = "\n  <section id=\"product-control-section\">\n    <div>\n      <form id=\"product-control-form\">\n        <label>\uCD94\uAC00\uD560 \uC0C1\uD488 \uC815\uBCF4\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.</label>\n          <div>\n            <input placeholder=\"\uC0C1\uD488\uBA85\" class=\"product-control-input\" />\n            <input type=\"number\" placeholder=\"\uAC00\uACA9\" class=\"product-control-input\" />\n            <input type=\"number\" placeholder=\"\uC218\uB7C9\" class=\"product-control-input\" />\n            <button type=\"submit\" id=\"product-add-button\">\uCD94\uAC00</button>\n          </div>\n      </form>  \n    </div>\n    <div>\n      <h1 id=\"product-table-title\">\uC0C1\uD488 \uD604\uD669</h1>\n      <table id=\"product-control-table\">\n        <tr>\n          <th>\uC0C1\uD488\uBA85</th>\n          <th>\uAC00\uACA9</th>\n          <th>\uC218\uB7C9</th>\n          <th></th>\n        </tr>\n      </table>\n    </div>\n  </section>";
 var addProductTemplate = function (_a) {
@@ -3540,6 +1663,7 @@ var editProductTemplate = function (_a) {
     var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
     return "\n    <td class=\"product-name\" data-name=\"".concat(productName, "\" ><input class=\"product-edit-input\" value=\"").concat(productName, "\" /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productPrice, "' /></td>\n    <td><input class=\"product-edit-input\" value='").concat(productQuantity, "' /></td>\n    <td><button type=\"button\" class=\"product-confirm-button\">\uD655\uC778</button></td>\n  ");
 };
+var productSectionNoAuthority = "<p>\uC811\uADFC \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.</p>";
 
 
 
@@ -3551,7 +1675,6 @@ var editProductTemplate = function (_a) {
   \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3626,7 +1749,6 @@ var Purchase = /** @class */ (function () {
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3726,7 +1848,6 @@ var PurchaseInfo = /** @class */ (function () {
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3781,7 +1902,6 @@ var PurchaseView = /** @class */ (function () {
   \********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "purchaseTemplate": () => (/* binding */ purchaseTemplate),
@@ -3803,7 +1923,6 @@ var purchasePossibleProductTemplate = function (_a) {
   \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -3888,12 +2007,7 @@ var Signup = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordConfirmInfoMessage.classList.add("member-info-error-text");
             _this.passwordConfirmInfoMessage.classList.remove("member-info-correct-text");
-            try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue);
-            }
-            catch (_a) {
-                var message = _a.message;
-                _this.passwordConfirmInfoMessage.textContent = "".concat(message);
+            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, _this.passwordConfirmInfoMessage) === false) {
                 return;
             }
             _this.passwordConfirmInfoMessage.textContent = "비밀번호가 일치합니다!";
@@ -3910,12 +2024,7 @@ var Signup = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordInfoMessage.classList.add("member-info-error-text");
             _this.passwordInfoMessage.classList.remove("member-info-correct-text");
-            try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue);
-            }
-            catch (_a) {
-                var message = _a.message;
-                _this.passwordInfoMessage.textContent = "".concat(message);
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, _this.passwordInfoMessage)) {
                 return;
             }
             if (passwordInputValue.length >= 8) {
@@ -3937,12 +2046,7 @@ var Signup = /** @class */ (function () {
             var nameInputValue = _this.nameInfoInput.value;
             _this.nameInfoMessage.classList.add("member-info-error-text");
             _this.nameInfoMessage.classList.remove("member-info-correct-text");
-            try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue);
-            }
-            catch (_a) {
-                var message = _a.message;
-                _this.nameInfoMessage.textContent = "".concat(message);
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, _this.nameInfoMessage)) {
                 return;
             }
             _this.nameInfoMessage.textContent = "멋진 이름이네요!";
@@ -3959,12 +2063,7 @@ var Signup = /** @class */ (function () {
             var emailInputValue = _this.emailInfoInput.value;
             _this.emailInfoMessage.classList.add("member-info-error-text");
             _this.emailInfoMessage.classList.remove("member-info-correct-text");
-            try {
-                (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValue);
-            }
-            catch (_a) {
-                var message = _a.message;
-                _this.emailInfoMessage.textContent = "".concat(message);
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValue, _this.emailInfoMessage)) {
                 return;
             }
             _this.emailInfoMessage.textContent = "멋진 이메일이네요!";
@@ -3972,22 +2071,24 @@ var Signup = /** @class */ (function () {
             _this.emailInfoMessage.classList.add("member-info-correct-text");
         };
         this.handleSubmitSignup = function (event) { return __awaiter(_this, void 0, void 0, function () {
-            var emailInputValueResult, nameInputValue, passwordInputValue, passwordConfirmInputValue, response, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var emailInputValueResult, nameInputValue, passwordInputValue, passwordConfirmInputValue, response, _a, message;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         event.preventDefault();
                         emailInputValueResult = this.emailInfoInput.value;
                         nameInputValue = this.nameInfoInput.value;
                         passwordInputValue = this.passwordInfoInput.value;
                         passwordConfirmInputValue = this.passwordConfirmInfoInput.value;
-                        _a.label = 1;
+                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValueResult, this.emailInfoMessage) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, this.nameInfoMessage) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, this.passwordInfoMessage) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, this.passwordConfirmInfoMessage)) {
+                            return [2 /*return*/];
+                        }
+                        _b.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValueResult);
-                        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue);
-                        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue);
-                        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue);
+                        _b.trys.push([1, 3, , 4]);
                         return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/register", {
                                 method: "POST",
                                 body: JSON.stringify({
@@ -4000,19 +2101,18 @@ var Signup = /** @class */ (function () {
                                 }
                             })];
                     case 2:
-                        response = _a.sent();
-                        console.log(response);
-                        if (response.status === 404) {
-                            throw Error();
-                            return [2 /*return*/];
+                        response = _b.sent();
+                        if (Math.floor(response.status / 100) !== 2) {
+                            throw Error("시스템에러 발생하였습니다. 잠시후 다시 시도해주세요.");
                         }
                         history.pushState({ path: "#login" }, null, "#login");
                         this.convertTemplate("#login");
                         (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)("회원가입을 완료하였습니다.");
                         return [3 /*break*/, 4];
                     case 3:
-                        error_1 = _a.sent();
-                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)("모든 값을 입력해주세요.");
+                        _a = _b.sent();
+                        message = _a.message;
+                        (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)(message);
                         return [2 /*return*/];
                     case 4: return [2 /*return*/];
                 }
@@ -4039,7 +2139,6 @@ var Signup = /** @class */ (function () {
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "signupTemplate": () => (/* binding */ signupTemplate)
@@ -4056,7 +2155,6 @@ var signupTemplate = "\n  <section id=\"signup-section\">\n    <h1 class=\"membe
   \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "showSnackbar": () => (/* binding */ showSnackbar)
@@ -4097,7 +2195,6 @@ var removeSnackbar = function (snackbarWrap) {
   \********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "snackbarTemplate": () => (/* binding */ snackbarTemplate),
@@ -4138,7 +2235,6 @@ var editProductInfoText = function (_a) {
   \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "PRODUCT": () => (/* binding */ PRODUCT),
@@ -4177,7 +2273,6 @@ var numberAsc = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
   \*****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "selectDom": () => (/* binding */ selectDom),
@@ -4217,7 +2312,6 @@ var addEvent = function (target, eventName, handler) {
   \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "validateProductName": () => (/* binding */ validateProductName),
@@ -4283,68 +2377,100 @@ var validatePossiblePurchaseProduct = function (_a) {
         throw new Error("보유한 금액이 부족합니다. 구매를 원하시면 금액을 더 투입해주세요.");
     }
 };
-var validateEmailInfo = function (emailInputValue) {
+var validateEmailInfo = function (emailInputValue, emailInfoMessage) {
     var emailInfoSplit = emailInputValue.split("");
     var emailInfoSplitAt = emailInputValue.split("@");
-    if (!emailInputValue) {
-        throw Error("필수 정보입니다.");
+    try {
+        if (!emailInputValue) {
+            throw Error("필수 정보입니다.");
+        }
+        if (!emailInfoSplit.includes("@")) {
+            throw Error("이메일 입력값에는 @가 필수입니다.");
+        }
+        if (emailInfoSplit.filter(function (text) { return text === "@"; }).length > 1) {
+            throw Error("@ 다음 부분에 @기호를 포함할 수 없습니다.");
+        }
+        if (emailInfoSplitAt[0].length === 0) {
+            throw Error("@ 앞부분을 입력해주세요.");
+        }
+        if (emailInfoSplitAt[1].length < 1) {
+            throw Error("@ 뒷부분을 입력해주세요.");
+        }
+        if (emailInfoSplit.find(function (text) { return text === " "; })) {
+            throw Error("이메일에 공백을 포함할 수 없습니다.");
+        }
+        return true;
     }
-    if (!emailInfoSplit.includes("@")) {
-        throw Error("이메일 입력값에는 @가 필수입니다.");
-    }
-    if (emailInfoSplit.filter(function (text) { return text === "@"; }).length > 1) {
-        throw Error("@ 다음 부분에 @기호를 포함할 수 없습니다.");
-    }
-    if (emailInfoSplitAt[0].length === 0) {
-        throw Error("@ 앞부분을 입력해주세요.");
-    }
-    if (emailInfoSplitAt[1].length < 1) {
-        throw Error("@ 뒷부분을 입력해주세요.");
-    }
-    if (emailInfoSplit.find(function (text) { return text === " "; })) {
-        throw Error("이메일에 공백을 포함할 수 없습니다.");
-    }
-};
-var validateNameInfo = function (nameInputValue) {
-    if (!nameInputValue) {
-        throw Error("필수 정보입니다.");
-    }
-    if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(nameInputValue.charCodeAt(index)); })) {
-        throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
-    }
-    if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(nameInputValue.charCodeAt(index)); })) {
-        throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
-    }
-    if (nameInputValue.split("").find(function (text) { return text === " "; })) {
-        throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
+    catch (_a) {
+        var message = _a.message;
+        emailInfoMessage.textContent = "".concat(message);
+        return false;
     }
 };
-var validatePasswordInfo = function (passwordInputValue) {
-    if (!passwordInputValue) {
-        throw Error("필수 정보입니다.");
+var validateNameInfo = function (nameInputValue, nameInfoMessage) {
+    try {
+        if (!nameInputValue) {
+            throw Error("필수 정보입니다.");
+        }
+        if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(nameInputValue.charCodeAt(index)); })) {
+            throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
+        }
+        if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(nameInputValue.charCodeAt(index)); })) {
+            throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
+        }
+        if (nameInputValue.split("").find(function (text) { return text === " "; })) {
+            throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
+        }
+        return true;
     }
-    if (passwordInputValue.split("").find(function (text) { return text === " "; })) {
-        throw Error("비밀번호에 공백을 포함할 수 없습니다.");
-    }
-    if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(passwordInputValue.charCodeAt(index)); })) {
-        throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
-    }
-    if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.upperCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
-        throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
-    }
-    if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.lowerCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
-        throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
-    }
-    if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(passwordInputValue.charCodeAt(index)); })) {
-        throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
+    catch (_a) {
+        var message = _a.message;
+        nameInfoMessage.textContent = "".concat(message);
+        return false;
     }
 };
-var validatePasswordConfirmInfo = function (passwordConfirmInputValue, passwordInputValue) {
-    if (!passwordConfirmInputValue) {
-        throw Error("필수 정보입니다.");
+var validatePasswordInfo = function (passwordInputValue, passwordInfoMessage) {
+    try {
+        if (!passwordInputValue) {
+            throw Error("필수 정보입니다.");
+        }
+        if (passwordInputValue.split("").find(function (text) { return text === " "; })) {
+            throw Error("비밀번호에 공백을 포함할 수 없습니다.");
+        }
+        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+            throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
+        }
+        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.upperCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+            throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
+        }
+        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.lowerCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+            throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
+        }
+        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+            throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
+        }
+        return true;
     }
-    if (passwordInputValue !== passwordConfirmInputValue) {
-        throw Error("비밀번호가 일치하지 않습니다.");
+    catch (_a) {
+        var message = _a.message;
+        passwordInfoMessage.textContent = "".concat(message);
+        return false;
+    }
+};
+var validatePasswordConfirmInfo = function (passwordConfirmInputValue, passwordInputValue, passwordConfirmInfoMessage) {
+    try {
+        if (!passwordConfirmInputValue) {
+            throw Error("필수 정보입니다.");
+        }
+        if (passwordInputValue !== passwordConfirmInputValue) {
+            throw Error("비밀번호가 일치하지 않습니다.");
+        }
+        return true;
+    }
+    catch (_a) {
+        var message = _a.message;
+        passwordConfirmInfoMessage.textContent = "".concat(message);
+        return false;
     }
 };
 
@@ -4421,9 +2547,8 @@ var validatePasswordConfirmInfo = function (passwordConfirmInputValue, passwordI
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
