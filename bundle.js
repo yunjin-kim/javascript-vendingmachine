@@ -59,7 +59,7 @@ ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_chargePage_css__W
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_purchasePage_css__WEBPACK_IMPORTED_MODULE_4__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_memberPage_css__WEBPACK_IMPORTED_MODULE_5__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }", "",{"version":3,"sources":["webpack://./src/css/index.css"],"names":[],"mappings":"AAKA;EACE,aAAa;EACb,sBAAsB;EACtB,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,iBAAiB;AACnB;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,gBAAgB;AAClB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,iBAAiB;EACjB,eAAe;EACf,sBAAsB;AACxB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,aAAa;AACf;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,qBAAqB;AACvB;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,kBAAkB;AACpB;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,mBAAmB;EACnB,yBAAyB;EACzB,cAAc;EACd,kBAAkB;EAClB,gBAAgB;EAChB,eAAe;EACf,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;EAEE,WAAW;EACX,cAAc;EACd,gBAAgB;EAChB;AACF;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;EACZ,iBAAiB;EACjB,YAAY;EACZ,eAAe;AACjB;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;;;EAIE,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;;;;;;;;EAQE,YAAY;EACZ,YAAY;EACZ,6BAA6B;EAC7B,gCAAgC;AAClC;;AAEA;;;EAGE,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;AACd;;AAEA;;EAEE,WAAW;AACb;;AAEA;;;EAGE,mBAAmB;AACrB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,eAAe;EACf,YAAY;EACZ,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;AAC3B;;AAEA;EACE,cAAc;EACd,iBAAiB;EACjB,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;AACzB;;AAEA,uBAAuB,OAAO,UAAU,EAAE,EAAE,KAAK,UAAU,EAAE,EAAE","sourcesContent":["@import \"./productPage.css\";\n@import \"./chargePage.css\";\n@import \"./purchasePage.css\";\n@import \"./memberPage.css\";\n\n#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }\n", "",{"version":3,"sources":["webpack://./src/css/index.css"],"names":[],"mappings":"AAKA;EACE,aAAa;EACb,sBAAsB;EACtB,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,iBAAiB;AACnB;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,gBAAgB;AAClB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;AACrB;;AAEA;EACE,eAAe;EACf,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,iBAAiB;EACjB,eAAe;EACf,sBAAsB;AACxB;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,mBAAmB;EACnB,aAAa;AACf;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,qBAAqB;AACvB;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,kBAAkB;AACpB;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,mBAAmB;EACnB,yBAAyB;EACzB,cAAc;EACd,kBAAkB;EAClB,gBAAgB;EAChB,eAAe;EACf,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,UAAU;AACZ;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE;AACF;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;EAEE,WAAW;EACX,cAAc;EACd,gBAAgB;EAChB;AACF;;AAEA;;;EAGE,WAAW;EACX,YAAY;EACZ,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;EACZ,iBAAiB;EACjB,YAAY;EACZ,eAAe;AACjB;;AAEA;;;EAGE,yBAAyB;AAC3B;;AAEA;;;;EAIE,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;;;;;;;;EAQE,YAAY;EACZ,YAAY;EACZ,6BAA6B;EAC7B,gCAAgC;AAClC;;AAEA;;;EAGE,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,YAAY;AACd;;AAEA;;EAEE,WAAW;AACb;;AAEA;;;EAGE,mBAAmB;AACrB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,eAAe;EACf,YAAY;EACZ,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,YAAY;EACZ,yBAAyB;AAC3B;;AAEA;EACE,cAAc;EACd,iBAAiB;EACjB,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;AACzB;;AAEA,uBAAuB,OAAO,UAAU,EAAE,EAAE,KAAK,UAAU,EAAE,EAAE","sourcesContent":["@import \"./productPage.css\";\n@import \"./chargePage.css\";\n@import \"./purchasePage.css\";\n@import \"./memberPage.css\";\n\n#app {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n}\n\ninput {\n  padding: 0;\n}\n\nbutton {\n  border: none;\n}\n\n.header {\n  width: 470px;\n}\n\n.header-text {\n  text-align: center;\n}\n\n.member-wrap {\n  float: right;\n  margin-top: -50px;\n}\n\n.member-login-button {\n  width: 60px;\n  height: 30px;\n  cursor: pointer;\n  font-weight: 800;\n}\n\n.member-login-button:hover {\n  background-color: #ebebeb;\n}\n\n.nav {\n  display: flex;\n  justify-content: center;\n  margin-bottom: 48px;\n}\n\n.button {\n  cursor: pointer;\n  border-radius: 4px;\n  border: none;\n  font-style: normal;\n  font-weight: bold;\n  font-size: 14px;\n  letter-spacing: 1.25px;\n}\n\n.nav__button {\n  width: 120px;\n  height: 36px;\n  background: #f5f5f5;\n  margin: 0 4px;\n}\n\n.nav__button:hover {\n  background: #ebebeb;\n}\n\n.button-click {\n  background: #00bcd41f;\n}\n\n.user-info-section {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n}\n\n.user-info-text,\n.user-info-edit,\n.user-logout {\n  width: 30px;\n  height: 26px;\n  border-radius: 15px;\n  background-color: #00bcd4;\n  color: #000000;\n  text-align: center;\n  font-weight: 800;\n  cursor: pointer;\n  padding-top: 4px;\n  margin-bottom: 4px;\n}\n\n.user-info-text {\n  z-index: 2;\n}\n\n.user-info-edit {\n  position: absolute;\n}\n\n.edit-button-animation {\n  top: 34px\n}\n\n.user-logout {\n  position: absolute;\n}\n\n.logout-button-animation {\n  top: 68px\n}\n\n.user-info-text:hover,\n.user-info-edit:hover ,\n.user-logout:hover {\n  background-color: #00e1ff;\n}\n\n.user-info-edit > svg,\n.user-logout > svg {\n  width: 16px;\n  color: #ebebeb;\n  padding-top: 2px;\n  pointer-events: none\n}\n\n#product-add-button,\n#charge-add-button,\n#insert-money-button {\n  width: 56px;\n  height: 38px;\n  cursor: pointer;\n  background: #00bcd4;\n  border-radius: 5px;\n  border: none;\n  margin-left: 16px;\n  color: white;\n  font-size: 16px;\n}\n\n#product-add-button:hover,\n#charge-add-button:hover,\n#insert-money-button:hover {\n  background-color: #00e1ff;\n}\n\n#product-table-title,\n#charge-table-title,\n#purchase-product-table-title,\n#return-charge-table-title {\n  text-align: center;\n  margin-top: 40px;\n}\n\n#product-control-table td,\n#product-control-table th,\n#charge-control-table td,\n#charge-control-table th,\n#purchase-possible-product-table td,\n#purchase-possible-product-table th,\n#return-charge-table td,\n#return-charge-table th {\n  width: 118px;\n  height: 40px;\n  border-top: 1px solid #dcdcdc;\n  border-bottom: 1px solid #dcdcdc;\n}\n\n.product-edit-button,\n.product-remove-button,\n.product-confirm-button {\n  cursor: pointer;\n  background: #f5f5f5;\n  border-radius: 5px;\n  height: 32px;\n}\n\n.product-edit-button,\n.product-remove-button {\n  width: 50px;\n}\n\n.product-edit-button:hover,\n.product-remove-button:hover,\n.product-confirm-button:hover {\n  background: #ebebeb;\n}\n\n.disabled-input {\n  background-color: #999999;\n}\n\n#snackbar-wrap {\n  width: 302px;\n  overflow: hidden;\n  position: fixed;\n  bottom: 10px;\n  left: 20px;\n}\n\n.snackbar {\n  width: 300px;\n  height: 60px;\n  background-color: #5c5c5c;\n}\n\n.snackbar-text {\n  color: #ebebeb;\n  line-height: 22px;\n  padding: 8px 8px 6px 10px;\n}\n\n.snackbar-animation {\n  animation: 2s showSnack;\n}\n\n@keyframes showSnack { from { opacity: 0; } to { opacity: 1; } }\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -750,8 +750,8 @@ __webpack_require__.r(__webpack_exports__);
 var Charge = /** @class */ (function () {
     function Charge() {
         var _this = this;
-        this.handleInputAmount = function (e) {
-            e.preventDefault();
+        this.handleInputAmount = function (event) {
+            event.preventDefault();
             var charge = _this.chargeInput.valueAsNumber;
             (0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateCharge)(charge);
             (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)((0,_snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_3__.insertMoneyText)(charge));
@@ -978,9 +978,9 @@ var EditMember = /** @class */ (function () {
                         nameInputValue = this.nameInfoInput.value;
                         passwordInputValue = this.passwordInfoInput.value;
                         passwordConfirmInputValue = this.passwordConfirmInfoInput.value;
-                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, this.nameInfoMessage) ||
-                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, this.passwordInfoMessage) ||
-                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, this.passwordConfirmInfoMessage)) {
+                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)({ nameInputValue: nameInputValue, nameInfoMessage: this.nameInfoMessage }) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)({ passwordInputValue: passwordInputValue, passwordInfoMessage: this.passwordInfoMessage }) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)({ passwordConfirmInputValue: passwordConfirmInputValue, passwordInputValue: passwordInputValue, passwordConfirmInfoMessage: this.passwordConfirmInfoMessage })) {
                             return [2 /*return*/];
                         }
                         _b.label = 1;
@@ -1029,7 +1029,7 @@ var EditMember = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordConfirmInfoMessage.classList.add("member-info-error-text");
             _this.passwordConfirmInfoMessage.classList.remove("member-info-correct-text");
-            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, _this.passwordConfirmInfoMessage) === false) {
+            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)({ passwordConfirmInputValue: passwordConfirmInputValue, passwordInputValue: passwordInputValue, passwordConfirmInfoMessage: _this.passwordConfirmInfoMessage }) === false) {
                 return;
             }
             _this.passwordConfirmInfoMessage.textContent = "비밀번호가 일치합니다!";
@@ -1046,7 +1046,7 @@ var EditMember = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordInfoMessage.classList.add("member-info-error-text");
             _this.passwordInfoMessage.classList.remove("member-info-correct-text");
-            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, _this.passwordInfoMessage)) {
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)({ passwordInputValue: passwordInputValue, passwordInfoMessage: _this.passwordInfoMessage })) {
                 return;
             }
             if (passwordInputValue.length >= 8) {
@@ -1068,7 +1068,7 @@ var EditMember = /** @class */ (function () {
             var nameInputValue = _this.nameInfoInput.value;
             _this.nameInfoMessage.classList.add("member-info-error-text");
             _this.nameInfoMessage.classList.remove("member-info-correct-text");
-            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, _this.nameInfoMessage)) {
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)({ nameInputValue: nameInputValue, nameInfoMessage: _this.nameInfoMessage })) {
                 return;
             }
             _this.nameInfoMessage.textContent = "멋진 이름이네요!";
@@ -1080,27 +1080,29 @@ var EditMember = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _c.trys.push([0, 3, , 4]);
+                        this.vendingmachineFunctionWrap.replaceChildren();
+                        _c.label = 1;
+                    case 1:
+                        _c.trys.push([1, 4, , 5]);
                         return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/users/".concat(this.getUserId()), {
                                 method: "GET"
                             })];
-                    case 1:
+                    case 2:
                         response = _c.sent();
                         if (Math.floor(response.status / 100) !== 2) {
                             throw Error("시스템에러 발생하였습니다. 잠시후 다시 시도해주세요.");
                         }
                         return [4 /*yield*/, response.json()];
-                    case 2:
-                        _a = _c.sent(), email = _a.email, name_1 = _a.name;
-                        this.vendingmachineFunctionWrap.replaceChildren();
-                        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_editMemberInfoTemplate__WEBPACK_IMPORTED_MODULE_3__.editMemberInfoTemplate)(email, name_1));
-                        return [3 /*break*/, 4];
                     case 3:
+                        _a = _c.sent(), email = _a.email, name_1 = _a.name;
+                        this.vendingmachineFunctionWrap.insertAdjacentHTML("beforeend", (0,_editMemberInfoTemplate__WEBPACK_IMPORTED_MODULE_3__.editMemberInfoTemplate)(email, name_1));
+                        return [3 /*break*/, 5];
+                    case 4:
                         _b = _c.sent();
                         message = _b.message;
                         (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_2__.showSnackbar)(message);
                         return [2 /*return*/];
-                    case 4:
+                    case 5:
                         this.bindEditDom();
                         return [2 /*return*/];
                 }
@@ -1329,21 +1331,21 @@ var MenuTab = /** @class */ (function () {
             history.pushState({ path: "#login" }, null, "#login");
             _this.convertTemplate("#login");
         };
-        this.handleMenuTab = function (e) {
-            if (!e.target.classList.contains("nav__button")) {
+        this.handleMenuTab = function (event) {
+            if (!event.target.classList.contains("nav__button")) {
                 return;
             }
             var navList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".nav__button");
-            if (e.target.dataset.menu ===
+            if (event.target.dataset.menu ===
                 navList.find(function (navButton) { return navButton.classList.contains("button-click"); }).dataset.menu) {
                 return;
             }
             navList.forEach(function (navButton) {
-                return navButton.dataset.menu === e.target.dataset.menu
+                return navButton.dataset.menu === event.target.dataset.menu
                     ? navButton.classList.add("button-click")
                     : navButton.classList.remove("button-click");
             });
-            history.pushState({ path: e.target.dataset.menu }, null, e.target.dataset.menu);
+            history.pushState({ path: event.target.dataset.menu }, null, event.target.dataset.menu);
             _this.convertTemplate(location.hash);
         };
         this.renderLogout = function () {
@@ -1409,6 +1411,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../snackbar/snackbarTemplate */ "./src/ts/components/snackbar/snackbarTemplate.ts");
 /* harmony import */ var _ProductInfo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ProductInfo */ "./src/ts/components/product/ProductInfo.ts");
 /* harmony import */ var _ProductView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ProductView */ "./src/ts/components/product/ProductView.ts");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 
 
 
@@ -1431,16 +1444,17 @@ var Product = /** @class */ (function () {
         this.handleAddProduct = function (event) {
             event.preventDefault();
             var _a = _this.productInfoInputs.map(function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
-            _this.productInfo.validateProductInfo({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity });
-            (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__.showSnackbar)((0,_snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_2__.registerProductText)({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity }));
-            _this.productInfo.addProductList({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity });
-            _this.productView.changeProductInfoInputEmpty();
-            _this.productView.focusProductNameInput();
-            _this.productView.addProduct({
+            var product = {
                 productName: productName,
                 productPrice: +productPrice,
                 productQuantity: +productQuantity
-            });
+            };
+            _this.productInfo.validateProductInfo(__assign({}, product));
+            (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__.showSnackbar)((0,_snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_2__.registerProductText)(__assign({}, product)));
+            _this.productInfo.addProductList(__assign({}, product));
+            _this.productView.changeProductInfoInputEmpty();
+            _this.productView.focusProductNameInput();
+            _this.productView.addProduct(__assign({}, product));
         };
         this.handleRemoveProduct = function (event) {
             if (!confirm("정말 삭제하시겠습니까?")) {
@@ -1458,14 +1472,19 @@ var Product = /** @class */ (function () {
         };
         this.handleConfirmProduct = function (event) {
             var _a = Array.from((0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-edit-input", event.target.closest("tr")), function (input) { return input.value; }), productName = _a[0], productPrice = _a[1], productQuantity = _a[2];
+            var product = {
+                productName: productName,
+                productPrice: +productPrice,
+                productQuantity: +productQuantity
+            };
             var beforeProductName = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".product-name", event.target.closest("tr")).dataset.name;
-            _this.productInfo.validateEditProductInfo({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity, beforeProductName: beforeProductName });
-            (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__.showSnackbar)((0,_snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_2__.editProductInfoText)({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity }));
-            _this.productView.editProduct({ target: event.target, productName: productName, productPrice: +productPrice, productQuantity: +productQuantity });
+            _this.productInfo.validateEditProductInfo(__assign(__assign({}, product), { beforeProductName: beforeProductName }));
+            (0,_snackbar_snackbar__WEBPACK_IMPORTED_MODULE_1__.showSnackbar)((0,_snackbar_snackbarTemplate__WEBPACK_IMPORTED_MODULE_2__.editProductInfoText)(__assign({}, product)));
+            _this.productView.editProduct(__assign({ target: event.target }, product));
             var changeProductIndex = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-name", _this.productTable)
                 .map(function (productTd) { return productTd.textContent; })
                 .indexOf(productName);
-            _this.productInfo.editProduct({ productName: productName, productPrice: +productPrice, productQuantity: +productQuantity, changeProductIndex: changeProductIndex });
+            _this.productInfo.editProduct(__assign(__assign({}, product), { changeProductIndex: changeProductIndex }));
         };
         this.productInfo = new _ProductInfo__WEBPACK_IMPORTED_MODULE_3__["default"]();
         this.productView = new _ProductView__WEBPACK_IMPORTED_MODULE_4__["default"]();
@@ -1504,6 +1523,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _utils_validation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/validation */ "./src/ts/utils/validation.ts");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __rest = (undefined && undefined.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -1546,10 +1587,10 @@ var ProductInfo = /** @class */ (function () {
         this.setProductList();
     };
     ProductInfo.prototype.editProduct = function (_a) {
-        var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity, changeProductIndex = _a.changeProductIndex;
-        this.productList[changeProductIndex].productName = productName;
-        this.productList[changeProductIndex].productPrice = productPrice;
-        this.productList[changeProductIndex].productQuantity = productQuantity;
+        var changeProductIndex = _a.changeProductIndex, productProps = __rest(_a, ["changeProductIndex"]);
+        this.productList[changeProductIndex] = __assign({}, productProps);
+        this.productList[changeProductIndex] = __assign({}, productProps);
+        this.productList[changeProductIndex] = __assign({}, productProps);
         this.setProductList();
     };
     ProductInfo.prototype.setProductList = function () {
@@ -1654,7 +1695,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "editProductTemplate": () => (/* binding */ editProductTemplate),
 /* harmony export */   "productSectionNoAuthority": () => (/* binding */ productSectionNoAuthority)
 /* harmony export */ });
-var productTemplate = "\n  <section id=\"product-control-section\">\n    <div>\n      <form id=\"product-control-form\">\n        <label>\uCD94\uAC00\uD560 \uC0C1\uD488 \uC815\uBCF4\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.</label>\n          <div>\n            <input placeholder=\"\uC0C1\uD488\uBA85\" class=\"product-control-input\" />\n            <input type=\"number\" placeholder=\"\uAC00\uACA9\" class=\"product-control-input\" />\n            <input type=\"number\" placeholder=\"\uC218\uB7C9\" class=\"product-control-input\" />\n            <button type=\"submit\" id=\"product-add-button\">\uCD94\uAC00</button>\n          </div>\n      </form>  \n    </div>\n    <div>\n      <h1 id=\"product-table-title\">\uC0C1\uD488 \uD604\uD669</h1>\n      <table id=\"product-control-table\">\n        <tr>\n          <th>\uC0C1\uD488\uBA85</th>\n          <th>\uAC00\uACA9</th>\n          <th>\uC218\uB7C9</th>\n          <th></th>\n        </tr>\n      </table>\n    </div>\n  </section>";
+var productTemplate = "\n    <section id=\"product-control-section\">\n      <div>\n        <form id=\"product-control-form\">\n          <label>\uCD94\uAC00\uD560 \uC0C1\uD488 \uC815\uBCF4\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.</label>\n            <div>\n              <input placeholder=\"\uC0C1\uD488\uBA85\" class=\"product-control-input\" />\n              <input type=\"number\" placeholder=\"\uAC00\uACA9\" class=\"product-control-input\" />\n              <input type=\"number\" placeholder=\"\uC218\uB7C9\" class=\"product-control-input\" />\n              <button type=\"submit\" id=\"product-add-button\">\uCD94\uAC00</button>\n            </div>\n        </form>  \n      </div>\n      <div>\n        <h1 id=\"product-table-title\">\uC0C1\uD488 \uD604\uD669</h1>\n        <table id=\"product-control-table\">\n          <tr>\n            <th>\uC0C1\uD488\uBA85</th>\n            <th>\uAC00\uACA9</th>\n            <th>\uC218\uB7C9</th>\n            <th></th>\n          </tr>\n        </table>\n      </div>\n    </section>";
 var addProductTemplate = function (_a) {
     var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
     return "\n    <tr>\n      <td class=\"product-name\">".concat(productName, "</td>\n      <td>").concat(productPrice, "</td>\n      <td>").concat(productQuantity, "</td>\n      <td>\n        <button type=\"button\" class=\"product-edit-button\">\uC218\uC815</button>\n        <button type=\"button\" class=\"product-remove-button\">\uC81C\uAC70</button>\n      </td>\n    </tr>");
@@ -1771,36 +1812,32 @@ var PurchaseInfo = /** @class */ (function () {
         this.setInsertMoney();
         this.setCoinList();
     };
-    PurchaseInfo.prototype.calulateReturnCharge = function (returnCharge) {
+    PurchaseInfo.prototype.calulateReturnCharge = function (insertMoneyOnlyCoin) {
         this.returnCoinsKindCount = { 10: 0, 50: 0, 100: 0, 500: 0 };
         this.coinsKindCount = this.getCoinList();
-        while (returnCharge !== 0) {
-            if (returnCharge >= 500 && this.coinsKindCount[500] > 0) {
-                returnCharge -= 500;
-                this.coinsKindCount[500] -= 1;
-                this.returnCoinsKindCount[500] += 1;
+        this.insertMoneyOnlyCoin = insertMoneyOnlyCoin;
+        while (this.insertMoneyOnlyCoin !== 0) {
+            if (this.insertMoneyOnlyCoin >= 500 && this.coinsKindCount[500] > 0) {
+                this.operationDependCoinKind(500);
             }
-            else if (returnCharge >= 100 && this.coinsKindCount[100] > 0) {
-                returnCharge -= 100;
-                this.coinsKindCount[100] -= 1;
-                this.returnCoinsKindCount[100] += 1;
+            else if (this.insertMoneyOnlyCoin >= 100 && this.coinsKindCount[100] > 0) {
+                this.operationDependCoinKind(100);
             }
-            else if (returnCharge >= 50 && this.coinsKindCount[50] > 0) {
-                returnCharge -= 50;
-                this.coinsKindCount[50] -= 1;
-                this.returnCoinsKindCount[50] += 1;
+            else if (this.insertMoneyOnlyCoin >= 50 && this.coinsKindCount[50] > 0) {
+                this.operationDependCoinKind(50);
             }
-            else if (returnCharge >= 10) {
-                if (this.coinsKindCount[10] > 0) {
-                    returnCharge -= 10;
-                    this.coinsKindCount[10] -= 1;
-                    this.returnCoinsKindCount[10] += 1;
-                }
-                else if (this.coinsKindCount[10] === 0) {
-                    break;
-                }
+            else if (this.insertMoneyOnlyCoin >= 10 && this.coinsKindCount[10] > 0) {
+                this.operationDependCoinKind(10);
+            }
+            if (this.insertMoneyOnlyCoin >= 10 && this.coinsKindCount[10] === 0) {
+                break;
             }
         }
+    };
+    PurchaseInfo.prototype.operationDependCoinKind = function (coinKind) {
+        this.insertMoneyOnlyCoin -= coinKind;
+        this.coinsKindCount[coinKind] -= 1;
+        this.returnCoinsKindCount[coinKind] += 1;
     };
     PurchaseInfo.prototype.updateProductList = function () {
         this.productList = this.getProductList();
@@ -2007,7 +2044,7 @@ var Signup = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordConfirmInfoMessage.classList.add("member-info-error-text");
             _this.passwordConfirmInfoMessage.classList.remove("member-info-correct-text");
-            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, _this.passwordConfirmInfoMessage) === false) {
+            if ((0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)({ passwordConfirmInputValue: passwordConfirmInputValue, passwordInputValue: passwordInputValue, passwordConfirmInfoMessage: _this.passwordConfirmInfoMessage }) === false) {
                 return;
             }
             _this.passwordConfirmInfoMessage.textContent = "비밀번호가 일치합니다!";
@@ -2024,7 +2061,7 @@ var Signup = /** @class */ (function () {
             var passwordInputValue = _this.passwordInfoInput.value;
             _this.passwordInfoMessage.classList.add("member-info-error-text");
             _this.passwordInfoMessage.classList.remove("member-info-correct-text");
-            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, _this.passwordInfoMessage)) {
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)({ passwordInputValue: passwordInputValue, passwordInfoMessage: _this.passwordInfoMessage })) {
                 return;
             }
             if (passwordInputValue.length >= 8) {
@@ -2046,7 +2083,7 @@ var Signup = /** @class */ (function () {
             var nameInputValue = _this.nameInfoInput.value;
             _this.nameInfoMessage.classList.add("member-info-error-text");
             _this.nameInfoMessage.classList.remove("member-info-correct-text");
-            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, _this.nameInfoMessage)) {
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)({ nameInputValue: nameInputValue, nameInfoMessage: _this.nameInfoMessage })) {
                 return;
             }
             _this.nameInfoMessage.textContent = "멋진 이름이네요!";
@@ -2063,7 +2100,7 @@ var Signup = /** @class */ (function () {
             var emailInputValue = _this.emailInfoInput.value;
             _this.emailInfoMessage.classList.add("member-info-error-text");
             _this.emailInfoMessage.classList.remove("member-info-correct-text");
-            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValue, _this.emailInfoMessage)) {
+            if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)({ emailInputValue: emailInputValue, emailInfoMessage: _this.emailInfoMessage })) {
                 return;
             }
             _this.emailInfoMessage.textContent = "멋진 이메일이네요!";
@@ -2071,19 +2108,27 @@ var Signup = /** @class */ (function () {
             _this.emailInfoMessage.classList.add("member-info-correct-text");
         };
         this.handleSubmitSignup = function (event) { return __awaiter(_this, void 0, void 0, function () {
-            var emailInputValueResult, nameInputValue, passwordInputValue, passwordConfirmInputValue, response, _a, message;
+            var emailInputValue, nameInputValue, passwordInputValue, passwordConfirmInputValue, response, _a, message;
+            var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         event.preventDefault();
-                        emailInputValueResult = this.emailInfoInput.value;
+                        if (this.signupDebounce) {
+                            return [2 /*return*/];
+                        }
+                        this.signupDebounce = true;
+                        setTimeout(function () {
+                            _this.signupDebounce = false;
+                        }, 2000);
+                        emailInputValue = this.emailInfoInput.value;
                         nameInputValue = this.nameInfoInput.value;
                         passwordInputValue = this.passwordInfoInput.value;
                         passwordConfirmInputValue = this.passwordConfirmInfoInput.value;
-                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)(emailInputValueResult, this.emailInfoMessage) ||
-                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)(nameInputValue, this.nameInfoMessage) ||
-                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)(passwordInputValue, this.passwordInfoMessage) ||
-                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)(passwordConfirmInputValue, passwordInputValue, this.passwordConfirmInfoMessage)) {
+                        if (!(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateEmailInfo)({ emailInputValue: emailInputValue, emailInfoMessage: this.emailInfoMessage }) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validateNameInfo)({ nameInputValue: nameInputValue, nameInfoMessage: this.nameInfoMessage }) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordInfo)({ passwordInputValue: passwordInputValue, passwordInfoMessage: this.passwordInfoMessage }) ||
+                            !(0,_utils_validation__WEBPACK_IMPORTED_MODULE_1__.validatePasswordConfirmInfo)({ passwordConfirmInputValue: passwordConfirmInputValue, passwordInputValue: passwordInputValue, passwordConfirmInfoMessage: this.passwordConfirmInfoMessage })) {
                             return [2 /*return*/];
                         }
                         _b.label = 1;
@@ -2092,7 +2137,7 @@ var Signup = /** @class */ (function () {
                         return [4 /*yield*/, fetch("https://vendingdb.herokuapp.com/register", {
                                 method: "POST",
                                 body: JSON.stringify({
-                                    email: emailInputValueResult,
+                                    email: emailInputValue,
                                     name: nameInputValue,
                                     password: passwordInputValue
                                 }),
@@ -2119,6 +2164,7 @@ var Signup = /** @class */ (function () {
             });
         }); };
         this.convertTemplate = convertTemplate;
+        this.signupDebounce = false;
         this.vendingmachineFunctionWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".main");
     }
     Signup.prototype.render = function () {
@@ -2377,9 +2423,12 @@ var validatePossiblePurchaseProduct = function (_a) {
         throw new Error("보유한 금액이 부족합니다. 구매를 원하시면 금액을 더 투입해주세요.");
     }
 };
-var validateEmailInfo = function (emailInputValue, emailInfoMessage) {
+var validateEmailInfo = function (_a) {
+    var emailInputValue = _a.emailInputValue, emailInfoMessage = _a.emailInfoMessage;
     var emailInfoSplit = emailInputValue.split("");
     var emailInfoSplitAt = emailInputValue.split("@");
+    var emailName = emailInfoSplitAt[0];
+    var emailDomain = emailInfoSplitAt[1];
     try {
         if (!emailInputValue) {
             throw Error("필수 정보입니다.");
@@ -2390,10 +2439,10 @@ var validateEmailInfo = function (emailInputValue, emailInfoMessage) {
         if (emailInfoSplit.filter(function (text) { return text === "@"; }).length > 1) {
             throw Error("@ 다음 부분에 @기호를 포함할 수 없습니다.");
         }
-        if (emailInfoSplitAt[0].length === 0) {
+        if (emailName.length === 0) {
             throw Error("@ 앞부분을 입력해주세요.");
         }
-        if (emailInfoSplitAt[1].length < 1) {
+        if (emailDomain.length < 1) {
             throw Error("@ 뒷부분을 입력해주세요.");
         }
         if (emailInfoSplit.find(function (text) { return text === " "; })) {
@@ -2401,63 +2450,68 @@ var validateEmailInfo = function (emailInputValue, emailInfoMessage) {
         }
         return true;
     }
-    catch (_a) {
-        var message = _a.message;
+    catch (_b) {
+        var message = _b.message;
         emailInfoMessage.textContent = "".concat(message);
         return false;
     }
 };
-var validateNameInfo = function (nameInputValue, nameInfoMessage) {
+var validateNameInfo = function (_a) {
+    var nameInputValue = _a.nameInputValue, nameInfoMessage = _a.nameInfoMessage;
+    var numberInputValueSplit = nameInputValue.split("");
     try {
         if (!nameInputValue) {
             throw Error("필수 정보입니다.");
         }
-        if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(nameInputValue.charCodeAt(index)); })) {
+        if (numberInputValueSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(nameInputValue.charCodeAt(index)); })) {
             throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
         }
-        if (nameInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(nameInputValue.charCodeAt(index)); })) {
+        if (numberInputValueSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(nameInputValue.charCodeAt(index)); })) {
             throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
         }
-        if (nameInputValue.split("").find(function (text) { return text === " "; })) {
+        if (numberInputValueSplit.find(function (text) { return text === " "; })) {
             throw Error("한글과 영문을 입력해주세요. (특수기호, 숫자, 공백 사용 불가)");
         }
         return true;
     }
-    catch (_a) {
-        var message = _a.message;
+    catch (_b) {
+        var message = _b.message;
         nameInfoMessage.textContent = "".concat(message);
         return false;
     }
 };
-var validatePasswordInfo = function (passwordInputValue, passwordInfoMessage) {
+var validatePasswordInfo = function (_a) {
+    var passwordInputValue = _a.passwordInputValue, passwordInfoMessage = _a.passwordInfoMessage;
+    var validatePasswordInfoSplit = passwordInputValue.split("");
     try {
         if (!passwordInputValue) {
             throw Error("필수 정보입니다.");
         }
-        if (passwordInputValue.split("").find(function (text) { return text === " "; })) {
+        if (validatePasswordInfoSplit.find(function (text) { return text === " "; })) {
             throw Error("비밀번호에 공백을 포함할 수 없습니다.");
         }
-        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+        if (!validatePasswordInfoSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.specialSymbolAsc.includes(passwordInputValue.charCodeAt(index)); })) {
             throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
         }
-        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.upperCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+        if (!validatePasswordInfoSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.upperCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
             throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
         }
-        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.lowerCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+        if (!validatePasswordInfoSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.lowerCaseAsc.includes(passwordInputValue.charCodeAt(index)); })) {
             throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
         }
-        if (!passwordInputValue.split("").find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(passwordInputValue.charCodeAt(index)); })) {
+        if (!validatePasswordInfoSplit.find(function (_, index) { return _constants__WEBPACK_IMPORTED_MODULE_0__.numberAsc.includes(passwordInputValue.charCodeAt(index)); })) {
             throw Error("8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.");
         }
         return true;
     }
-    catch (_a) {
-        var message = _a.message;
+    catch (_b) {
+        var message = _b.message;
         passwordInfoMessage.textContent = "".concat(message);
         return false;
     }
 };
-var validatePasswordConfirmInfo = function (passwordConfirmInputValue, passwordInputValue, passwordConfirmInfoMessage) {
+var validatePasswordConfirmInfo = function (_a) {
+    var passwordConfirmInputValue = _a.passwordConfirmInputValue, passwordInputValue = _a.passwordInputValue, passwordConfirmInfoMessage = _a.passwordConfirmInfoMessage;
     try {
         if (!passwordConfirmInputValue) {
             throw Error("필수 정보입니다.");
@@ -2467,8 +2521,8 @@ var validatePasswordConfirmInfo = function (passwordConfirmInputValue, passwordI
         }
         return true;
     }
-    catch (_a) {
-        var message = _a.message;
+    catch (_b) {
+        var message = _b.message;
         passwordConfirmInfoMessage.textContent = "".concat(message);
         return false;
     }
