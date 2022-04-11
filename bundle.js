@@ -762,10 +762,10 @@ var Charge = /** @class */ (function () {
         this.chargeView = new _ChargeView__WEBPACK_IMPORTED_MODULE_5__["default"]();
     }
     Charge.prototype.bindChargeDom = function () {
-        this.chargeForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#charge-control-form");
-        this.chargeInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".charge-control-input");
+        var chargeForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#charge-control-form");
+        this.chargeInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".charge-control-input", chargeForm);
         this.currentContainCharge = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#current-contain-charge");
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.chargeForm, "submit", this.handleInputAmount);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(chargeForm, "submit", this.handleInputAmount);
     };
     Charge.prototype.render = function () {
         this.chargeView.renderChargeView(this.chargeInfo.getUserName());
@@ -1353,9 +1353,7 @@ var MenuTab = /** @class */ (function () {
             _this.vendingmachineHeader.insertAdjacentHTML("beforeend", "".concat(_this.renderVendingmachineHeader(JSON.parse(localStorage.getItem("USER_NAME")))));
         };
         this.renderVendingmachineHeader = function (userName) {
-            return "<h1 class=\"header-text\">\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> \n      <div class=\"member-wrap\">\n        ".concat(userName
-                ? "<div class=\"user-info-section\">\n              <div class=\"user-info-text\">\n                ".concat(userName.split("")[0], "\n              </div>\n              <button class=\"user-info-edit\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z\"/></svg>\n              </button>\n              <div class=\"user-logout\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M160 416H96c-17.67 0-32-14.33-32-32V128c0-17.67 14.33-32 32-32h64c17.67 0 32-14.33 32-32S177.7 32 160 32H96C42.98 32 0 74.98 0 128v256c0 53.02 42.98 96 96 96h64c17.67 0 32-14.33 32-32S177.7 416 160 416zM502.6 233.4l-128-128c-12.51-12.51-32.76-12.49-45.25 0c-12.5 12.5-12.5 32.75 0 45.25L402.8 224H192C174.3 224 160 238.3 160 256s14.31 32 32 32h210.8l-73.38 73.38c-12.5 12.5-12.5 32.75 0 45.25s32.75 12.5 45.25 0l128-128C515.1 266.1 515.1 245.9 502.6 233.4z\"/></svg>\n              </div>\n            </div>")
-                : "<button class=\"member-login-button\">\uB85C\uADF8\uC778</button>", "\n      </div>\n      ").concat(_menuTabTemplate__WEBPACK_IMPORTED_MODULE_1__.menuTabTemplate);
+            return (0,_menuTabTemplate__WEBPACK_IMPORTED_MODULE_1__.vendingmachineHeaderTemplate)(userName);
         };
         this.convertTemplate = convertTemplate;
         this.vendingmachineWrap = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#app");
@@ -1388,9 +1386,15 @@ var MenuTab = /** @class */ (function () {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "menuTabTemplate": () => (/* binding */ menuTabTemplate)
+/* harmony export */   "menuTabTemplate": () => (/* binding */ menuTabTemplate),
+/* harmony export */   "vendingmachineHeaderTemplate": () => (/* binding */ vendingmachineHeaderTemplate)
 /* harmony export */ });
 var menuTabTemplate = "\n  <nav class=\"nav\"> \n    <button type=\"button\" class=\"button nav__button button-click\" data-menu=\"#product\">\n      \uC0C1\uD488 \uAD00\uB9AC\n    </button> \n    <button type=\"button\" class=\"button nav__button\" data-menu=\"#charge\">\n      \uC794\uB3C8 \uCDA9\uC804\n    </button> \n    <button type=\"button\" class=\"button nav__button\" data-menu=\"#purchase\">\n      \uC0C1\uD488 \uAD6C\uB9E4\n    </button> \n  </nav>";
+var vendingmachineHeaderTemplate = function (userName) {
+    return "\n    <h1 class=\"header-text\">\uD83C\uDF7F \uC790\uD310\uAE30 \uD83C\uDF7F</h1> \n    <div class=\"member-wrap\">\n      ".concat(userName
+        ? "<div class=\"user-info-section\">\n            <div class=\"user-info-text\">\n              ".concat(userName.split("")[0], "\n            </div>\n            <button class=\"user-info-edit\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z\"/></svg>\n            </button>\n            <div class=\"user-logout\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d=\"M160 416H96c-17.67 0-32-14.33-32-32V128c0-17.67 14.33-32 32-32h64c17.67 0 32-14.33 32-32S177.7 32 160 32H96C42.98 32 0 74.98 0 128v256c0 53.02 42.98 96 96 96h64c17.67 0 32-14.33 32-32S177.7 416 160 416zM502.6 233.4l-128-128c-12.51-12.51-32.76-12.49-45.25 0c-12.5 12.5-12.5 32.75 0 45.25L402.8 224H192C174.3 224 160 238.3 160 256s14.31 32 32 32h210.8l-73.38 73.38c-12.5 12.5-12.5 32.75 0 45.25s32.75 12.5 45.25 0l128-128C515.1 266.1 515.1 245.9 502.6 233.4z\"/></svg>\n            </div>\n          </div>")
+        : "<button class=\"member-login-button\">\uB85C\uADF8\uC778</button>", "\n    </div>\n    ").concat(menuTabTemplate);
+};
 
 
 
@@ -1492,9 +1496,9 @@ var Product = /** @class */ (function () {
     }
     Product.prototype.bindProductDom = function () {
         this.productInfoInputs = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".product-control-input");
-        this.productAddButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-add-button");
         this.productTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-control-table");
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productAddButton, "click", this.handleAddProduct);
+        var productAddButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#product-add-button");
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(productAddButton, "click", this.handleAddProduct);
         (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.productTable, "click", this.handleControlProduct);
         this.productView.focusProductNameInput();
     };
@@ -1563,8 +1567,8 @@ var ProductInfo = /** @class */ (function () {
         var productName = _a.productName, productPrice = _a.productPrice, productQuantity = _a.productQuantity;
         var productNameList = this.productList.map(function (product) { return product.productName; });
         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductName)(productName);
-        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductPrice)(+productPrice);
-        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.valudateProductQuantity)(+productQuantity);
+        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductPrice)(productPrice);
+        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.valudateProductQuantity)(productQuantity);
         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateSameProductName)(productName, productNameList);
     };
     ProductInfo.prototype.validateEditProductInfo = function (_a) {
@@ -1573,8 +1577,8 @@ var ProductInfo = /** @class */ (function () {
             .map(function (product) { return product.productName; })
             .filter(function (productName) { return productName !== beforeProductName; });
         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductName)(productName);
-        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductPrice)(+productPrice);
-        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.valudateProductQuantity)(+productQuantity);
+        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateProductPrice)(productPrice);
+        (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.valudateProductQuantity)(productQuantity);
         (0,_utils_validation__WEBPACK_IMPORTED_MODULE_0__.validateSameProductName)(productName, productNameList);
     };
     ProductInfo.prototype.addProductList = function (_a) {
@@ -1761,14 +1765,14 @@ var Purchase = /** @class */ (function () {
         this.purchaseView = new _PurchaseView__WEBPACK_IMPORTED_MODULE_5__["default"]();
     }
     Purchase.prototype.bindPurchaseDom = function () {
-        this.insertMoneyForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#insert-money-form");
-        this.insertMoneyInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".insert-money-input");
+        var insertMoneyForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#insert-money-form");
+        var purchasePossibleProductTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#purchase-possible-product-table");
+        var returnMoneyButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#return-money-button");
+        this.insertMoneyInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".insert-money-input", insertMoneyForm);
         this.insertMoneyText = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#insert-money-text");
-        this.purchasePossibleProductTable = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#purchase-possible-product-table");
-        this.returnMoneyButton = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#return-money-button");
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.insertMoneyForm, "submit", this.handleInsertMoney);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.purchasePossibleProductTable, "click", this.handlePurchaseProduct);
-        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(this.returnMoneyButton, "click", this.handleReturnMoney);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(insertMoneyForm, "submit", this.handleInsertMoney);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(purchasePossibleProductTable, "click", this.handlePurchaseProduct);
+        (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(returnMoneyButton, "click", this.handleReturnMoney);
     };
     Purchase.prototype.render = function () {
         this.purchaseView.renderPurchaseView();
@@ -2014,15 +2018,14 @@ var Signup = /** @class */ (function () {
         this.convertTemplate = convertTemplate;
         this.bindSignupDom = function () {
             var signupForm = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)(".member-info-form");
-            _this.signupInputList = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDomAll)(".member-info-input");
-            _this.emailInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#email-info-input");
-            _this.nameInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-input");
-            _this.passwordInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-input");
-            _this.passwordConfirmInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-input");
-            _this.emailInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#email-info-message");
-            _this.nameInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-message");
-            _this.passwordInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-message");
-            _this.passwordConfirmInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-message");
+            _this.emailInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#email-info-input", signupForm);
+            _this.nameInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-input", signupForm);
+            _this.passwordInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-input", signupForm);
+            _this.passwordConfirmInfoInput = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-input", signupForm);
+            _this.emailInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#email-info-message", signupForm);
+            _this.nameInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#name-info-message", signupForm);
+            _this.passwordInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-info-message", signupForm);
+            _this.passwordConfirmInfoMessage = (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.selectDom)("#password-confirm-info-message", signupForm);
             (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(signupForm, "submit", _this.handleSubmitSignup);
             (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.emailInfoInput, "keydown", _this.handleEmailInputKeyEvent);
             (0,_utils_dom__WEBPACK_IMPORTED_MODULE_0__.addEvent)(_this.emailInfoInput, "focusout", _this.handleEmailInputMouseEvent);
