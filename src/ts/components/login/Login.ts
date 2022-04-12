@@ -1,3 +1,4 @@
+import { fetcher } from "../../utils/api";
 import { addEvent, selectDom, selectDomAll } from "../../utils/dom";
 import { ConvertTemplate } from "../../utils/interface";
 import { validateLoginEmail, validateLoginPassword } from "../../utils/validation";
@@ -46,15 +47,13 @@ class Login {
     }
     
     try {
-      const response = await fetch("https://vendingdb.herokuapp.com/login", {
-        method: "POST",
-        body: JSON.stringify({
+      const response = await fetcher({ 
+        path: "https://vendingdb.herokuapp.com/login",
+        methodName: "POST",
+        bodyInfo: {
           email: emailInputValue,
           password: passwordValue,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        }
+        } 
       });
       
       if (Math.floor(response.status/100) !== 2) {
