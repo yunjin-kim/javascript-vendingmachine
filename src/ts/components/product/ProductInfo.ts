@@ -40,8 +40,6 @@ class ProductInfo implements ProductInfoProps{
 
   editProduct({ changeProductIndex, ...productProps }: ProductEditProps) {
     this.productList[changeProductIndex] = { ...productProps };
-    this.productList[changeProductIndex] = { ...productProps };
-    this.productList[changeProductIndex] = { ...productProps };
     this.setProductList();
   }
 

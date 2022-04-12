@@ -48,12 +48,12 @@ class Product {
       productQuantity: +productQuantity,
     };
 
-    this.productInfo.validateProductInfo({ ...product });
-    showSnackbar(registerProductText({ ...product }));
-    this.productInfo.addProductList({ ...product });
+    this.productInfo.validateProductInfo(product);
+    showSnackbar(registerProductText(product ));
+    this.productInfo.addProductList(product);
     this.productView.changeProductInfoInputEmpty();
     this.productView.focusProductNameInput();
-    this.productView.addProduct({ ...product });
+    this.productView.addProduct(product);
   };
     
   handleRemoveProduct = (event: { target: HTMLTableElement }) => {
@@ -86,7 +86,7 @@ class Product {
     const beforeProductName = selectDom(".product-name", event.target.closest("tr")).dataset.name;
 
     this.productInfo.validateEditProductInfo({ ...product, beforeProductName });
-    showSnackbar(editProductInfoText({ ...product }));
+    showSnackbar(editProductInfoText(product));
     this.productView.editProduct({ target: event.target, ...product });
     const changeProductIndex = 
       selectDomAll(".product-name", this.productTable)
