@@ -1,3 +1,4 @@
+import 'cypress-wait-until';
 import { PRODUCT, CHARGE } from "../../src/ts/utils/constants";
 
 describe("관리자 회원가입, 로그인, 정보 수정, 로그아웃 테스트", () => {
@@ -14,6 +15,8 @@ describe("관리자 회원가입, 로그인, 정보 수정, 로그아웃 테스�
     cy.get("#password-confirm-info-input").type("QwEr1234!");
     cy.get(".member-confirm-button").click();
 
+    cy.waitUntil(() => cy.location('hash').should('eq', '#login') )
+
     cy.get(".snackbar-text").should("have.text", "회원가입을 완료하였습니다.");
   });
 // 
@@ -21,6 +24,8 @@ describe("관리자 회원가입, 로그인, 정보 수정, 로그아웃 테스�
     cy.get(".member-info-input").eq(0).type("sion0000@naver.com");
     cy.get(".member-info-input").eq(1).type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
+
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
 
     cy.get(".user-info-text").contains("카");
   });
@@ -38,17 +43,17 @@ describe("관리자 회원가입, 로그인, 정보 수정, 로그아웃 테스�
     cy.get(".member-info-input").eq(1).type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
 
-    cy.wait(3000);
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
 
     cy.get(".user-info-text").click();
     cy.get(".user-info-edit").click();
-
-    cy.wait(2000);
 
     cy.get("#name-info-input").type("카더가든");
     cy.get("#password-info-input").type("KimYJ0000!");
     cy.get("#password-confirm-info-input").type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
+
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
 
     cy.get(".snackbar-text").should("have.text", "수정을 완료하였습니다.");
   });
@@ -58,7 +63,7 @@ describe("관리자 회원가입, 로그인, 정보 수정, 로그아웃 테스�
     cy.get(".member-info-input").eq(1).type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
 
-    cy.wait(3000);
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
 
     cy.get(".user-info-text").click();
     cy.get(".user-logout").click();
@@ -78,7 +83,7 @@ describe("상품 관리 탭 테스트", () => {
     cy.get(".member-info-input").eq(1).type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
 
-    cy.wait(3000);
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
   })
 
   beforeEach(() => {
@@ -174,7 +179,7 @@ describe("잔돈 관리 탭 테스트", () => {
     cy.get(".member-info-input").eq(1).type("KimYJ0000!");
     cy.get(".member-confirm-button").click();
 
-    cy.wait(3000);
+    cy.waitUntil(() => cy.location('hash').should('eq', '#product') )
   })
 
   beforeEach(() => {
