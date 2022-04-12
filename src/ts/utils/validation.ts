@@ -220,6 +220,40 @@ const validatePasswordConfirmInfo = ({ passwordConfirmInputValue, passwordInputV
   }
 };
 
+const validateLoginEmail = ({ emailInputValue, loginErrorMessage }) => {
+  try {
+    validater([
+      {
+        checker: () => emailInputValue.trim() === "",
+        errorMsg: "이메일을 입력해주세요.",
+      },
+    ])
+
+    return true;
+  } catch ({ message }) {
+    loginErrorMessage.textContent = `${message}`;
+
+    return false;
+  }
+};
+
+const validateLoginPassword = ({ passwordValue, loginErrorMessage }) => {
+  try {
+    validater([
+      {
+        checker: () => passwordValue.trim() === "",
+        errorMsg: "비밀번호를 입력해주세요.",
+      },
+    ])
+
+    return true;
+  } catch ({ message }) {
+    loginErrorMessage.textContent = `${message}`;
+
+    return false;
+  }
+};
+
 export { 
   validateProductName,
   validateProductPrice,
@@ -230,5 +264,7 @@ export {
   validateEmailInfo,
   validateNameInfo,
   validatePasswordInfo,
-  validatePasswordConfirmInfo
+  validatePasswordConfirmInfo,
+  validateLoginEmail,
+  validateLoginPassword,
 };

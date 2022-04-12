@@ -6,6 +6,7 @@ const loginTemplate = `
       <input class="member-info-input" placeholder="example@gmail.com" type="email" />
       <label class="member-info-form-label">비밀번호</label>
       <input class="member-info-input" placeholder="비밀번호를 입력해주세요" type="password" autocomplete="off" minlength="8" maxlength="16" />
+      <p class="member-info-message member-info-error-text" id="login-error-message"></p>
       <button class="member-confirm-button" tpye="submit">확인</button>
     </form>
     <p>아직 회원이 아니신가요? <span class="signup-text">회원가입</span></p>
