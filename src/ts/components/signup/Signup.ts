@@ -150,10 +150,8 @@ class Signup {
     if (this.signupDebounce) {
       return;
     }
+
     this.signupDebounce = true;
-    setTimeout(() => {
-      this.signupDebounce = false;
-    }, 2000);
 
     const emailInputValue =  (this.emailInfoInput as HTMLInputElement).value;
     const nameInputValue = (this.nameInfoInput as HTMLInputElement).value;
@@ -166,6 +164,7 @@ class Signup {
       !validatePasswordInfo({ passwordInputValue: passwordInputValue, passwordInfoMessage: this.passwordInfoMessage}) ||
       !validatePasswordConfirmInfo({ passwordConfirmInputValue: passwordConfirmInputValue, passwordInputValue: passwordInputValue, passwordConfirmInfoMessage: this.passwordConfirmInfoMessage })
     ) {
+      this.signupDebounce = false;
       return;
     }
 
@@ -189,8 +188,10 @@ class Signup {
       history.pushState({ path: "#login" }, null, "#login");
       this.convertTemplate("#login");
       showSnackbar("회원가입을 완료하였습니다.");
+      this.signupDebounce = false;
     } catch ({ message }) {
       showSnackbar(message);
+      this.signupDebounce = false;
       return;
     }
   }
