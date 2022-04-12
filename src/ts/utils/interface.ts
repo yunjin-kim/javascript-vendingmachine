@@ -109,6 +109,11 @@ interface ValidateEmailInfoProps {
   emailInfoMessage: HTMLElement;
 }
 
+interface ValidateCheckerProps {
+  checker: Function; 
+  errorMsg: string;
+}
+
 type ConvertTemplate = (path: string) => void;
 
 type PagePath = "#login" | "#signup" | "#editMember" | "#product" | "#charge" | "#purchase";
@@ -129,6 +134,7 @@ export {
   ValidatePasswordInfoProps,
   ValidatePasswordConfirmInfoProps,
   ValidateEmailInfoProps,
+  ValidateCheckerProps,
   RegisterUserProps,
   ConvertTemplate,
   CoinsProps,
